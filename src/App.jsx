@@ -12,7 +12,7 @@ const Footer = lazy(() => import('./components/layout/Footer/Footer'));
 
 // Section Loading Skeleton Fallback
 const SectionSkeleton = () => (
-  <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8 animate-pulse">
+  <div className="mx-auto max-w-7xl px-4 py-14 sm:py-16 lg:py-20 animate-pulse">
     <div className="h-4 w-28 rounded-full bg-neutral-200 mb-4"></div>
     <div className="h-8 w-64 rounded-xl bg-neutral-200 mb-8"></div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -1,13 +1,12 @@
 export const PORTFOLIO_DATA = {
   hero: {
     greeting: "Hi, I am",
-    name: "Alex Carter",
-    title: "Full-Stack Developer & Creative Technologist",
+    name: "Chintan Nakum",
+    title: "Full-Stack Developer",
     bio: "Building fast, scalable web systems and crafted digital experiences with modern React, TypeScript, and cloud architecture.",
     stats: [
-      { label: "Years Experience", value: "4+" },
-      { label: "Completed Projects", value: "28+" },
-      { label: "Client Satisfaction", value: "100%" },
+      { label: "Months Experience", value: "6" },
+      { label: "Completed Projects", value: "5+" },
     ],
   },
   projects: [

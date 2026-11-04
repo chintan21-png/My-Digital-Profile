@@ -14,7 +14,7 @@ export const Footer = () => {
 
   return (
     <footer className="border-t border-neutral-200/80 bg-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex flex-col items-center sm:items-start">
           <span className="font-cabinet text-base font-bold text-neutral-950">
             {NAV_BRAND.name}
