@@ -42,14 +42,14 @@ export const Work = () => {
                     target="_blank"
                     rel="noreferrer"
                     aria-label={`View code for ${project.title}`}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 text-neutral-600 transition-colors group-hover:bg-[#3B5BFF] group-hover:text-white"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3B5BFF] text-white md:bg-neutral-100 md:text-neutral-600 md:group-hover:bg-[#3B5BFF] md:group-hover:text-white transition-colors"
                   >
                     <FiArrowUpRight className="h-4 w-4" />
                   </a>
                 </div>
 
                 {/* Title & Description */}
-                <h3 className="mt-4 font-cabinet text-xl font-bold text-neutral-950 group-hover:text-[#3B5BFF] transition-colors">
+                <h3 className="mt-4 font-cabinet text-xl font-bold text-[#3B5BFF] md:text-neutral-950 md:group-hover:text-[#3B5BFF] transition-colors">
                   {project.title}
                 </h3>
                 <p className="mt-2 text-sm text-neutral-600 leading-relaxed font-cabinet">
