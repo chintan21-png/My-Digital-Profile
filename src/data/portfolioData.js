@@ -47,34 +47,40 @@ export const PORTFOLIO_DATA = {
       { value: "100%", label: "Code Quality", testId: "stat-happy-clients" },
     ],
   },
+  experienceSummary: {
+    badge: "(Career)",
+    titlePrefix: "Where I’ve",
+    titleAccent: "been",
+    description:
+      "Hands-on experience across internships, full-stack development, and modern web applications — always close to the metal of the interface.",
+    range: "2025 → Today",
+  },
   experience: [
     {
-      period: "2024 — Present",
-      role: "Senior Frontend Engineer",
-      company: "Synthetix Labs",
-      description: "Leading frontend development of AI-powered developer tooling and component libraries.",
+      period: "April 2026 — November 2026",
+      role: "Full-Stack Developer Intern",
+      company: "Softcoding Solution",
+      description:
+        "Developed a fully dynamic e-commerce storefront for Bizconnect using React, integrating APIs for products, categories, shopping cart, orders, and other store functionalities. Implemented TanStack Query for server-state management, intelligent caching, and query optimization, reducing redundant API requests and improving data loading and user experience.",
+      technologies: ["React", "TanStack Query", "REST APIs", "Caching"],
     },
     {
-      period: "2022 — 2024",
-      role: "Full-Stack Developer",
-      company: "Nexus Digital",
-      description: "Delivered cloud-native client applications, REST APIs, and automated CI/CD pipelines.",
-    },
-    {
-      period: "2021 — 2022",
-      role: "Junior Web Developer",
-      company: "Vanguard Tech",
-      description: "Built responsive user interfaces, accessible design systems, and performed code reviews.",
+      period: "November 2025 — December 2025",
+      role: "MERN Stack Developer — Remote Workshop",
+      company: "Remote Workshop",
+      description:
+        "Completed a hands-on remote development workshop by building Taskfyer, a full-stack task management application using the MERN stack. Implemented JWT authentication, role-based access control, REST APIs, real-time task updates, and Excel-based admin reporting.",
+      technologies: ["MERN Stack", "JWT Auth", "Node.js", "REST APIs"],
     },
   ],
   skills: [
-    { category: "Frontend", items: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Vue.js", "Vite"] },
-    { category: "Backend", items: ["Node.js", "Express", "Python", "FastAPI", "PostgreSQL", "MongoDB"] },
-    { category: "DevOps & Tools", items: ["Docker", "Git / GitHub", "AWS", "CI/CD", "Linux", "Vercel"] },
+    { category: "Frontend", items: ["React", "TanStack Query", "JavaScript/TypeScript", "Tailwind CSS", "Vite"] },
+    { category: "Backend", items: ["Node.js", "Express", "MongoDB", "Java", "Python"] },
+    { category: "DevOps & Tools", items: ["Git / GitHub", "Render", "Vercel"] },
   ],
   contact: {
-    email: "alex.carter.dev@example.com",
-    location: "San Francisco, CA (Open to Remote)",
+    email: "chintannakum21@gmail.com",
+    location: "Ahmedabad Gujarat, India (Open to Remote-Hybrid-InOffice)",
     availability: "Available for freelance contracts & full-time roles.",
   },
 };

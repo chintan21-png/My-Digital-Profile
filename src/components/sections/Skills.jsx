@@ -1,5 +1,6 @@
 import { PORTFOLIO_DATA } from '../../data/portfolioData';
 import { ScrollReveal } from '../common/ScrollReveal';
+import Iridescence from '../ui/Iridescence';
 
 export const Skills = () => {
   const { skills } = PORTFOLIO_DATA;
@@ -27,19 +28,44 @@ export const Skills = () => {
             delay={idx * 120}
             className="h-full"
           >
-            <div className="h-full rounded-3xl border border-neutral-200/90 bg-white p-6 shadow-sm">
-              <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-500 mb-4 pb-2 border-b border-neutral-100">
-                {group.category}
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {group.items.map((skill) => (
-                  <span
-                    key={skill}
-                    className="rounded-xl border border-neutral-200/80 bg-neutral-50 px-3 py-1.5 font-cabinet text-sm font-medium text-neutral-800 transition-colors hover:border-[#3B5BFF] hover:bg-white hover:text-[#3B5BFF]"
-                  >
-                    {skill}
-                  </span>
-                ))}
+            <div className="group relative h-full rounded-3xl border border-neutral-200/90 bg-white/80 backdrop-blur-md p-6 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#3B5BFF]/30">
+              {/* Iridescence Interactive Background Effect */}
+              <div className="absolute inset-0 pointer-events-none opacity-40 transition-opacity duration-500 group-hover:opacity-65">
+                <Iridescence
+                  color="#3b82f6"
+                  hueShift={0}
+                  saturation={1}
+                  brightness={1.5}
+                  contrast={1}
+                  speed={0.8}
+                  scale={1}
+                  detail={8}
+                  warp={1}
+                  rotation={0}
+                  mouseReact={true}
+                  amplitude={0.1}
+                  stir={0.5}
+                  sheen={0.3}
+                  clickSwirl={true}
+                  grain={0}
+                  fade={0}
+                />
+              </div>
+
+              <div className="relative z-10 flex flex-col h-full">
+                <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-600 mb-4 pb-2 border-b border-neutral-200/60">
+                  {group.category}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {group.items.map((skill) => (
+                    <span
+                      key={skill}
+                      className="rounded-xl border border-neutral-200/80 bg-white/80 backdrop-blur-sm px-3 py-1.5 font-cabinet text-sm font-medium text-neutral-800 transition-all duration-200 hover:border-[#3B5BFF] hover:bg-white hover:text-[#3B5BFF] hover:shadow-xs"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </ScrollReveal>
