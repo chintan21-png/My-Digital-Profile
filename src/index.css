@@ -25,6 +25,17 @@ html, body {
   font-family: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+.text-stroke {
+  -webkit-text-stroke: 1.25px rgba(0, 0, 0, 0.08);
+  color: transparent;
+}
+
+@media (max-width: 640px) {
+  .text-stroke {
+    -webkit-text-stroke: 1px rgba(0, 0, 0, 0.07);
+  }
+}
+
 .font-mono-code {
   font-family: 'JetBrains Mono', monospace;
 }
