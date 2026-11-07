@@ -74,9 +74,37 @@ export const PORTFOLIO_DATA = {
     },
   ],
   skills: [
-    { category: "Frontend", items: ["React", "TanStack Query", "JavaScript/TypeScript", "Tailwind CSS", "Vite"] },
-    { category: "Backend", items: ["Node.js", "Express", "MongoDB", "Java", "Python"] },
-    { category: "DevOps & Tools", items: ["Git / GitHub", "Render", "Vercel"] },
+    {
+      category: "Programming Languages",
+      items: ["JavaScript", "TypeScript", "Java", "Python", "SQL", "HTML5", "CSS3"],
+    },
+    {
+      category: "Frameworks & Libraries",
+      items: [
+        "React",
+        "Node.js",
+        "Express.js",
+        "TanStack Query",
+        "Tailwind CSS",
+        "Mongoose",
+      ],
+    },
+    {
+      category: "Databases",
+      items: ["MongoDB", "PostgreSQL"],
+    },
+    {
+      category: "Tools & Platforms",
+      items: [
+        "Git",
+        "GitHub",
+        "Postman",
+        "VS Code",
+        "Vite",
+        "Vercel",
+        "Render",
+      ],
+    },
   ],
   contact: {
     email: "chintannakum21@gmail.com",
