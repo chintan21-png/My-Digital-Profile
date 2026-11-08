@@ -86,9 +86,8 @@ export const About = () => {
       return (
         <span
           key={idx}
-          className={`mr-[0.28em] inline-block ${
-            isAccent ? 'serif-accent font-normal text-[#3B5BFF]' : ''
-          }`}
+          className={`mr-[0.28em] inline-block ${isAccent ? 'serif-accent font-normal text-[#3B5BFF]' : ''
+            }`}
         >
           {word}
         </span>
@@ -98,7 +97,7 @@ export const About = () => {
 
   const stats = about.stats || [
     { value: '6+', label: 'Months experience', testId: 'stat-years-experience' },
-    { value: '5+', label: 'Projects shipped', testId: 'stat-projects-shipped' },
+    { value: '5+', label: 'Projects Built', testId: 'stat-projects-shipped' },
     { value: '100%', label: 'Code Quality', testId: 'stat-happy-clients' },
   ];
 
@@ -156,9 +155,8 @@ export const About = () => {
                     return (
                       <span
                         key={wIdx}
-                        className={`mr-[0.28em] inline-block transition-opacity duration-150 ease-out ${
-                          isAccent ? 'serif-accent font-normal text-[#3B5BFF]' : 'text-[#111]'
-                        }`}
+                        className={`mr-[0.28em] inline-block transition-opacity duration-150 ease-out ${isAccent ? 'serif-accent font-normal text-[#3B5BFF]' : 'text-[#111]'
+                          }`}
                         style={{ opacity }}
                       >
                         {word}

@@ -43,7 +43,7 @@ export const PORTFOLIO_DATA = {
     ],
     stats: [
       { value: "6+", label: "Months experience", testId: "stat-years-experience" },
-      { value: "5+", label: "Projects shipped", testId: "stat-projects-shipped" },
+      { value: "5+", label: "Projects Built", testId: "stat-projects-shipped" },
       { value: "100%", label: "Code Quality", testId: "stat-happy-clients" },
     ],
   },

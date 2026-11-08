@@ -1,4 +1,12 @@
 import { useState, useEffect } from 'react';
+import {
+  LuAtom,
+  LuZap,
+  LuMapPin,
+  LuClock,
+  LuAsterisk,
+  LuArrowDown,
+} from 'react-icons/lu';
 import { PORTFOLIO_DATA } from '../../data/portfolioData';
 
 export const Hero = () => {
@@ -43,6 +51,15 @@ export const Hero = () => {
   const locationDisplay = contact?.location
     ? contact.location.split('(')[0].trim()
     : 'Amsterdam, NL';
+
+  // Dynamic Name splitting from portfolioData (e.g. "Chintan Nakum" -> "CHINTAN" + "NAKUM")
+  const nameString = (hero?.name || 'Chintan Nakum').trim();
+  const nameWords = nameString.split(/\s+/);
+  const firstName = nameWords[0]?.toUpperCase() || 'CHINTAN';
+  const lastName =
+    nameWords.length > 1
+      ? nameWords.slice(1).join(' ').toUpperCase()
+      : '';
 
   // Dynamic Title splitting from portfolioData (e.g. "Full-Stack Developer" -> "FULL-STACK" + "developer")
   const titleString = (hero?.title || 'Frontend Developer').trim();
@@ -128,23 +145,7 @@ export const Hero = () => {
         <div style={{ opacity: 1, transform: 'rotate(6deg)' }}>
           <div className="animate-float-1">
             <div className="bg-white flex items-center gap-3 rounded-2xl border border-black/[0.08] px-4 py-3 shadow-card">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-4 shrink-0 text-[#3B5BFF]"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="1" />
-                <path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z" />
-                <path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z" />
-              </svg>
+              <LuAtom className="size-4 shrink-0 text-[#3B5BFF]" aria-hidden="true" />
               <div>
                 <p className="whitespace-nowrap font-cabinet text-xs font-bold text-zinc-800">
                   React · TS
@@ -160,7 +161,7 @@ export const Hero = () => {
 
       {/* Floating Interactive Badge: Motion Craft (Upper-Right) */}
       <div
-        className="pointer-events-none absolute z-20 right-[5%] lg:right-[7%] xl:right-[9%] top-[28%] lg:top-[30%] hidden md:flex transition-transform duration-500 ease-out"
+        className="pointer-events-none absolute z-20 right-[5%] lg:right-[7%] xl:right-[9%] top-[27%] lg:top-[29%] hidden md:flex transition-transform duration-500 ease-out"
         aria-hidden="true"
         style={{
           transform: `translateX(${mouseOffset.x * -10}px) translateY(${mouseOffset.y * 10}px)`,
@@ -169,21 +170,7 @@ export const Hero = () => {
         <div style={{ opacity: 1, transform: 'rotate(-5deg)' }}>
           <div className="animate-float-2">
             <div className="bg-tint-peach flex items-center gap-3 rounded-2xl border border-black/[0.08] px-4 py-3 shadow-card">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-4 shrink-0 text-[#3B5BFF]"
-                aria-hidden="true"
-              >
-                <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
-              </svg>
+              <LuZap className="size-4 shrink-0 text-[#3B5BFF]" aria-hidden="true" />
               <div>
                 <p className="whitespace-nowrap font-cabinet text-xs font-bold text-zinc-800">
                   Motion freak
@@ -199,7 +186,7 @@ export const Hero = () => {
 
       {/* Floating Interactive Badge 2: Location (Middle-Right) */}
       <div
-        className="pointer-events-none absolute z-20 right-[2%] lg:right-[3%] xl:right-[4%] top-[48%] lg:top-[50%] hidden lg:flex transition-transform duration-500 ease-out"
+        className="pointer-events-none absolute z-20 right-[2%] lg:right-[3%] xl:right-[4%] top-[43%] lg:top-[45%] hidden lg:flex transition-transform duration-500 ease-out"
         aria-hidden="true"
         style={{
           transform: `translateX(${mouseOffset.x * -8}px) translateY(${mouseOffset.y * 8}px)`,
@@ -208,22 +195,7 @@ export const Hero = () => {
         <div style={{ opacity: 1, transform: 'rotate(-3deg)' }}>
           <div className="animate-float-2">
             <div className="bg-tint-blue flex items-center gap-3 rounded-2xl border border-black/[0.08] px-4 py-3 shadow-card">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-4 shrink-0 text-[#3B5BFF]"
-                aria-hidden="true"
-              >
-                <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
+              <LuMapPin className="size-4 shrink-0 text-[#3B5BFF]" aria-hidden="true" />
               <div>
                 <p className="whitespace-nowrap font-cabinet text-xs font-bold text-zinc-800">
                   {locationDisplay}
@@ -239,7 +211,7 @@ export const Hero = () => {
 
       {/* Floating Interactive Badge 3: Local Time (Lower-Right) */}
       <div
-        className="pointer-events-none absolute z-20 right-[4%] lg:right-[5%] xl:right-[6%] top-[68%] lg:top-[70%] hidden md:flex transition-transform duration-500 ease-out"
+        className="pointer-events-none absolute z-20 right-[4%] lg:right-[5%] xl:right-[6%] top-[59%] lg:top-[61%] hidden md:flex transition-transform duration-500 ease-out"
         aria-hidden="true"
         style={{
           transform: `translateX(${mouseOffset.x * 8}px) translateY(${mouseOffset.y * -8}px)`,
@@ -248,22 +220,7 @@ export const Hero = () => {
         <div style={{ opacity: 1, transform: 'rotate(2deg)' }}>
           <div className="animate-float-1">
             <div className="bg-white flex items-center gap-3 rounded-2xl border border-black/[0.08] px-4 py-3 shadow-card">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-4 shrink-0 text-[#3B5BFF]"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
+              <LuClock className="size-4 shrink-0 text-[#3B5BFF]" aria-hidden="true" />
               <div>
                 <p className="whitespace-nowrap font-cabinet text-xs font-bold text-zinc-800">
                   {localTime || '19:24'}
@@ -277,11 +234,12 @@ export const Hero = () => {
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="relative z-10 flex min-h-[calc(100vh-4rem)] w-full max-w-7xl flex-col justify-center mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 gap-6 sm:gap-8">
+      {/* Main Content Area: Centered for Mobile View, Left-Aligned for Desktop */}
+      <div className="relative z-10 flex min-h-[calc(100vh-4rem)] w-full max-w-7xl flex-col justify-center items-center md:items-start text-center md:text-left mx-auto px-4 sm:px-6 lg:px-8 pt-26 sm:pt-28 md:pt-32 pb-14 sm:pb-16 gap-7 sm:gap-8">
+        
         {/* Availability Status Badge with vibrant green live dot */}
-        <div className="flex items-center">
-          <span className="inline-flex items-center gap-2.5 rounded-full border border-black/[0.06] bg-white/70 px-3.5 py-1.5 shadow-sm backdrop-blur-sm">
+        <div className="flex items-center justify-center md:justify-start w-full">
+          <span className="inline-flex items-center gap-2.5 rounded-full border border-black/[0.06] bg-white/80 px-4 py-2 shadow-sm backdrop-blur-sm">
             {/* Live green dot with gentle pulsing aura */}
             <span className="relative flex h-2.5 w-2.5 items-center justify-center">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
@@ -293,20 +251,27 @@ export const Hero = () => {
           </span>
         </div>
 
-        {/* Hero Headline with Cabinet Grotesk font */}
+        {/* Hero Headline with Cabinet Grotesk font: Enhanced scaling for Mobile & Two-tone name */}
         <h1
-          className="flex flex-col font-cabinet font-extrabold tracking-[-0.03em] leading-[0.98] text-zinc-800 text-[clamp(2.25rem,5vw,4.6rem)]"
+          className="flex flex-col items-center md:items-start font-cabinet font-extrabold tracking-[-0.03em] leading-[0.98] text-zinc-800 text-[clamp(2.75rem,8.2vw,4.6rem)] sm:text-[clamp(3.2rem,6.5vw,5rem)] md:text-[clamp(2.75rem,5vw,4.6rem)]"
           data-testid="hero-heading"
         >
-          <div className="flex flex-col gap-1 sm:gap-1.5">
+          <div className="flex flex-col gap-1.5 sm:gap-2">
             <span className="block overflow-hidden">
-              <span className="block will-change-transform text-zinc-800">
-                {(hero.name || 'CHINTAN NAKUM').toUpperCase()}
+              <span className="block will-change-transform">
+                <span className="flex flex-wrap items-baseline justify-center md:justify-start gap-x-2.5 sm:gap-x-3.5">
+                  <span className="text-zinc-800">{firstName}</span>
+                  {lastName && (
+                    <span className="text-[#3B5BFF] transition-colors duration-300 hover:text-[#2d47d6]">
+                      {lastName}
+                    </span>
+                  )}
+                </span>
               </span>
             </span>
             <span className="block overflow-hidden">
               <span className="block will-change-transform">
-                <span className="flex flex-wrap items-baseline gap-x-2.5 sm:gap-x-3 text-[0.88em]">
+                <span className="flex flex-wrap items-baseline justify-center md:justify-start gap-x-2.5 sm:gap-x-3 text-[0.88em]">
                   <span className="text-zinc-800">{rolePrefix}</span>
                   <span className="font-cabinet font-normal text-[#3B5BFF]">
                     {roleSuffix}
@@ -318,80 +283,62 @@ export const Hero = () => {
         </h1>
 
         {/* Subtitle Bio, CTAs & Circular Scroll Badge */}
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-xl flex flex-col gap-6">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between w-full">
+          <div className="max-w-xl flex flex-col gap-7 sm:gap-8 items-center md:items-start text-center md:text-left mx-auto md:mx-0">
             {/* Bio in Cabinet Grotesk */}
-            <div>
-              <p className="font-cabinet text-base leading-relaxed text-zinc-600 md:text-lg">
+            <div className="max-w-lg md:max-w-none">
+              <p className="font-cabinet text-base sm:text-lg md:text-lg leading-relaxed text-zinc-600">
                 {hero.bio}
               </p>
             </div>
 
-            {/* CTAs in Cabinet Grotesk */}
-            <div className="flex flex-wrap items-center gap-4">
+            {/* CTAs: Centered on Mobile with vibrant Accent Color (#3B5BFF), Sleek on Desktop */}
+            <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-3.5 sm:gap-4 w-full sm:w-auto">
               <a
                 data-testid="hero-view-work"
                 href="#work"
-                className="group inline-flex items-center gap-3 rounded-full bg-[#111] px-8 py-4 font-cabinet text-xs font-bold uppercase tracking-[0.16em] text-white transition-colors duration-300 hover:bg-[#3B5BFF]"
+                className="group inline-flex items-center justify-center gap-3 rounded-full bg-[#3B5BFF] md:bg-[#111] px-8 py-4 font-cabinet text-xs font-bold uppercase tracking-[0.16em] text-white shadow-sm shadow-[#3B5BFF]/25 md:shadow-none transition-all duration-300 hover:bg-[#2D47D6] md:hover:bg-[#3B5BFF] w-full max-w-xs sm:w-auto text-center"
               >
                 <span>View my work</span>
-                <svg
-                  viewBox="0 0 64 64"
+                <LuAsterisk
                   className="size-4 transition-transform duration-500 group-hover:rotate-90"
-                  fill="none"
                   aria-hidden="true"
-                >
-                  <g stroke="currentColor" strokeWidth="6.5" strokeLinecap="round">
-                    <path d="M32 13v38" />
-                    <path d="M48.3 22.5 15.7 41.5" />
-                    <path d="M15.7 22.5 48.3 41.5" />
-                  </g>
-                </svg>
+                />
               </a>
 
               <a
                 data-testid="hero-download-cv"
                 href="#contact"
-                className="group inline-flex items-center gap-3 rounded-full border border-black/15 bg-white/60 px-8 py-4 font-cabinet text-xs font-bold uppercase tracking-[0.16em] text-zinc-800 backdrop-blur transition-colors duration-300 hover:border-[#3B5BFF] hover:text-[#3B5BFF]"
+                className="group inline-flex items-center justify-center gap-3 rounded-full border border-black/15 bg-white/70 px-8 py-4 font-cabinet text-xs font-bold uppercase tracking-[0.16em] text-zinc-800 backdrop-blur transition-all duration-300 hover:border-[#3B5BFF] hover:text-[#3B5BFF] w-full max-w-xs sm:w-auto text-center"
               >
                 <span>Download CV</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <LuArrowDown
                   className="size-4 transition-transform duration-300 group-hover:translate-y-1"
                   aria-hidden="true"
-                >
-                  <path d="M12 5v14" />
-                  <path d="m19 12-7 7-7-7" />
-                </svg>
+                />
               </a>
             </div>
 
-            {/* Mobile / Tablet Quick Highlights Strip (Flex Responsiveness) */}
-            <div className="flex md:hidden flex-wrap items-center gap-2 pt-1">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white/80 px-3 py-1 font-cabinet text-xs font-medium text-zinc-700 shadow-sm">
+            {/* Mobile Quick Highlights Strip: Centered & Balanced with Local time tag */}
+            <div className="flex md:hidden flex-wrap items-center justify-center gap-2 pt-2 max-w-sm sm:max-w-md mx-auto">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white/90 px-3.5 py-1.5 font-cabinet text-xs font-medium text-zinc-700 shadow-sm">
                 <span className="size-1.5 rounded-full bg-[#3B5BFF]" />
                 React · TS
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-tint-peach/80 px-3 py-1 font-cabinet text-xs font-medium text-zinc-700 shadow-sm">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-tint-peach/90 px-3.5 py-1.5 font-cabinet text-xs font-medium text-zinc-700 shadow-sm">
                 <span className="size-1.5 rounded-full bg-amber-500" />
                 Framer · GSAP
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-tint-blue/80 px-3 py-1 font-cabinet text-xs font-medium text-zinc-700 shadow-sm">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-tint-blue/90 px-3.5 py-1.5 font-cabinet text-xs font-medium text-zinc-700 shadow-sm">
                 <span className="size-1.5 rounded-full bg-sky-500" />
                 {locationDisplay}
               </span>
               {localTime && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white/80 px-3 py-1 font-cabinet text-xs font-medium text-zinc-700 shadow-sm">
-                  <span className="size-1.5 rounded-full bg-emerald-500" />
-                  {localTime}
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white/90 px-3.5 py-1.5 font-cabinet text-xs font-medium text-zinc-700 shadow-sm">
+                  <LuClock className="size-3.5 shrink-0 text-[#3B5BFF]" aria-hidden="true" />
+                  <span>
+                    Local time : <strong className="font-bold text-zinc-800">{localTime}</strong>
+                  </span>
                 </span>
               )}
             </div>
@@ -425,22 +372,10 @@ export const Hero = () => {
                 </text>
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <LuArrowDown
                   className="size-5 text-[#3B5BFF] transition-transform duration-300 group-hover:translate-y-1"
                   aria-hidden="true"
-                >
-                  <path d="M12 5v14" />
-                  <path d="m19 12-7 7-7-7" />
-                </svg>
+                />
               </div>
             </a>
           </div>

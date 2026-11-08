@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { LuArrowUp } from 'react-icons/lu';
 import { NAV_BRAND, SOCIAL_LINKS } from '../../../data/navigation';
 
 export const Footer = () => {
@@ -139,23 +140,11 @@ export const Footer = () => {
               />
             </svg>
 
-            {/* Up Arrow SVG */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="lucide lucide-arrow-up size-4 text-black transition-transform duration-300 group-hover:-translate-y-0.5"
+            {/* Up Arrow Icon */}
+            <LuArrowUp
+              className="size-4 text-black transition-transform duration-300 group-hover:-translate-y-0.5"
               aria-hidden="true"
-            >
-              <path d="m5 12 7-7 7 7" />
-              <path d="M12 19V5" />
-            </svg>
+            />
           </button>
         </div>
       </div>
