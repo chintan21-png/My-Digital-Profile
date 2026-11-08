@@ -1,23 +1,42 @@
 import { FiArrowUpRight } from 'react-icons/fi';
 import { PORTFOLIO_DATA } from '../../data/portfolioData';
 import { ScrollReveal } from '../common/ScrollReveal';
+import { SplitText } from '../ui/SplitText';
 
 export const Work = () => {
   const { projects } = PORTFOLIO_DATA;
 
   return (
     <section id="work" className="py-14 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      {/* Section Header with reveal */}
-      <ScrollReveal direction="up" distance="24px" duration={700}>
-        <div className="flex flex-col items-start gap-2 mb-10 sm:mb-12">
-          <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[#3B5BFF]">
-            Selected Projects
-          </span>
-          <h2 className="font-cabinet text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-950">
-            Featured Work & Architecture
-          </h2>
-        </div>
-      </ScrollReveal>
+      {/* Section Header */}
+      <div className="flex flex-col items-start gap-2 mb-10 sm:mb-12">
+        <SplitText
+          tag="span"
+          text="Selected Projects"
+          className="font-mono text-sm font-semibold uppercase tracking-[0.2em] text-[#3B5BFF]"
+          effect="rise"
+          splitType="chars"
+          delay={40}
+          duration={1.2}
+          staggerFrom="start"
+          trigger="view"
+          hoverEffect="lift"
+          textAlign="left"
+        />
+        <SplitText
+          tag="h2"
+          text="Featured Work & Architecture"
+          className="font-cabinet text-4xl sm:text-5xl font-extrabold tracking-tight text-neutral-950"
+          effect="rise"
+          splitType="chars"
+          delay={35}
+          duration={1.25}
+          staggerFrom="start"
+          trigger="view"
+          hoverEffect="lift"
+          textAlign="left"
+        />
+      </div>
 
       {/* Projects Grid with staggered reveal */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -62,7 +81,7 @@ export const Work = () => {
                 {project.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full bg-neutral-100 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-neutral-700"
+                    className="rounded-full bg-[#3B5BFF] px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-wider text-white"
                   >
                     {tag}
                   </span>

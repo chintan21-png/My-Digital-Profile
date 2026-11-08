@@ -1,15 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,700;1,400;1,700&family=Syncopate:wght@400;700&display=swap");
 @import 'tailwindcss';
 
 @theme {
   --font-cabinet: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-syncopate: 'Syncopate', sans-serif;
+  --font-roboto-condensed: 'Roboto Condensed', sans-serif;
   --color-accent: #3b5bff;
   --color-accent-hover: #2d47d6;
 }
 
 :root {
   font-family: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --hero-color-active: #111416;
+  --hero-color-start: #d4d4d8;
+}
+
+.dark {
+  --hero-color-active: #ffffff;
+  --hero-color-start: #010406;
 }
 
 html, body {
@@ -23,6 +33,60 @@ html, body {
 
 .font-display {
   font-family: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-syncopate {
+  font-family: 'Syncopate', sans-serif;
+}
+
+.font-roboto-condensed {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+/* Syncopate Gradient Text Animation */
+.hero-gradient-item {
+  --color-hover: #fad089;
+  --color-active: var(--hero-color-active, #111416);
+  --color-start: var(--hero-color-start, #d4d4d8);
+  --stop-hover: 0%;
+  --stop-active: 0%;
+  background: linear-gradient(
+    90deg,
+    var(--color-hover) var(--stop-hover),
+    var(--color-active) var(--stop-hover),
+    var(--color-active) var(--stop-active),
+    var(--color-start) var(--stop-active)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Color palette #2 from original animation */
+.hero-gradient-item[data-gradient-item="1"],
+.hero-gradient-item:nth-child(1) {
+  --color-hover: #fad089;
+}
+
+.hero-gradient-item[data-gradient-item="2"],
+.hero-gradient-item:nth-child(2) {
+  --color-hover: #ff9c5b;
+}
+
+.hero-gradient-item[data-gradient-item="3"],
+.hero-gradient-item:nth-child(3) {
+  --color-hover: #f5634a;
+}
+
+.hero-gradient-item[data-gradient-item="4"],
+.hero-gradient-item:nth-child(4) {
+  --color-hover: #27ade4;
+}
+
+.hero-gradient-item[data-gradient-item="5"],
+.hero-gradient-item:nth-child(5) {
+  --color-hover: #60b99a;
 }
 
 .text-stroke {

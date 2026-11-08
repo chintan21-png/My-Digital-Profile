@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { CustomEase } from 'gsap/CustomEase';
 import {
   LuAtom,
   LuZap,
@@ -11,6 +13,7 @@ import { PORTFOLIO_DATA } from '../../data/portfolioData';
 
 export const Hero = () => {
   const { hero, contact } = PORTFOLIO_DATA;
+  const listRef = useRef(null);
 
   // Real-time local clock
   const [localTime, setLocalTime] = useState('');
@@ -61,8 +64,10 @@ export const Hero = () => {
       ? nameWords.slice(1).join(' ').toUpperCase()
       : '';
 
-  // Dynamic Title splitting from portfolioData (e.g. "Full-Stack Developer" -> "FULL-STACK" + "developer")
-  const titleString = (hero?.title || 'Frontend Developer').trim();
+  // Dynamic Title splitting from portfolioData (e.g. "Full - Stack Developer" -> "FULL-STACK" + "DEVELOPER")
+  const titleString = (hero?.title || 'Full-Stack Developer')
+    .replace(/\s*-\s*/g, '-')
+    .trim();
   const titleWords = titleString.split(/\s+/);
   const rolePrefix =
     titleWords.length > 1
@@ -70,8 +75,84 @@ export const Hero = () => {
       : titleWords[0].toUpperCase();
   const roleSuffix =
     titleWords.length > 1
-      ? titleWords[titleWords.length - 1].toLowerCase()
+      ? titleWords[titleWords.length - 1].toUpperCase()
       : '';
+
+  // GSAP Gradient Text Intro and Interactive Hover Animation
+  useEffect(() => {
+    gsap.registerPlugin(CustomEase);
+
+    // Exact custom cubic-bezier ease curve from the animation snippet
+    const customEase = CustomEase.create(
+      'heroGradientEase',
+      'M0,0 C0.548,0.032 0.63,1 1,1 '
+    );
+
+    const ctx = gsap.context(() => {
+      const items = listRef.current?.querySelectorAll('.hero-gradient-item');
+      if (!items || items.length === 0) return;
+
+      // Initialize stops to 0%
+      gsap.set(items, { '--stop-hover': '0%', '--stop-active': '0%' });
+
+      // Staggered intro timeline
+      gsap
+        .timeline({
+          defaults: {
+            duration: 0.48,
+          },
+        })
+        .to(items, {
+          '--stop-active': '100%',
+          stagger: {
+            each: 0.1,
+            ease: customEase,
+          },
+        })
+        .to(items, {
+          '--stop-hover': '100%',
+          stagger: {
+            each: 0.1,
+          },
+        })
+        .to(
+          items,
+          {
+            '--stop-hover': '0%',
+            stagger: {
+              each: -0.1,
+            },
+          },
+          '-=0.1'
+        );
+
+      // Interactive hover handlers on each list item
+      items.forEach((item) => {
+        const onMouseEnter = () => {
+          gsap.to(item, {
+            '--stop-hover': '100%',
+            ease: customEase,
+            duration: 0.36,
+            overwrite: 'auto',
+          });
+        };
+
+        const onMouseLeave = () => {
+          gsap.to(item, {
+            '--stop-hover': '0%',
+            ease: customEase,
+            duration: 0.36,
+            overwrite: 'auto',
+          });
+        };
+
+        item.addEventListener('mouseenter', onMouseEnter);
+        item.addEventListener('mouseleave', onMouseLeave);
+      });
+    }, listRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
     <section
@@ -251,35 +332,52 @@ export const Hero = () => {
           </span>
         </div>
 
-        {/* Hero Headline with Cabinet Grotesk font: Enhanced scaling for Mobile & Two-tone name */}
+        {/* Hero Headline with Syncopate font & GSAP Gradient Wipe Animation */}
         <h1
-          className="flex flex-col items-center md:items-start font-cabinet font-extrabold tracking-[-0.03em] leading-[0.98] text-zinc-800 text-[clamp(2.75rem,8.2vw,4.6rem)] sm:text-[clamp(3.2rem,6.5vw,5rem)] md:text-[clamp(2.75rem,5vw,4.6rem)]"
+          className="flex flex-col items-center md:items-start text-center md:text-left w-full"
           data-testid="hero-heading"
+          aria-label={`${nameString} - ${titleString}`}
         >
-          <div className="flex flex-col gap-1.5 sm:gap-2">
-            <span className="block overflow-hidden">
-              <span className="block will-change-transform">
-                <span className="flex flex-wrap items-baseline justify-center md:justify-start gap-x-2.5 sm:gap-x-3.5">
-                  <span className="text-zinc-800">{firstName}</span>
-                  {lastName && (
-                    <span className="text-[#3B5BFF] transition-colors duration-300 hover:text-[#2d47d6]">
-                      {lastName}
-                    </span>
-                  )}
-                </span>
-              </span>
-            </span>
-            <span className="block overflow-hidden">
-              <span className="block will-change-transform">
-                <span className="flex flex-wrap items-baseline justify-center md:justify-start gap-x-2.5 sm:gap-x-3 text-[0.88em]">
-                  <span className="text-zinc-800">{rolePrefix}</span>
-                  <span className="font-cabinet font-normal text-[#3B5BFF]">
-                    {roleSuffix}
-                  </span>
-                </span>
-              </span>
-            </span>
-          </div>
+          <ul
+            ref={listRef}
+            className="flex flex-col gap-3.5 sm:gap-3 md:gap-2.5 p-0 m-0 list-none font-syncopate select-none"
+          >
+            {/* Name Row: CHINTAN NAKUM */}
+            <div className="flex flex-wrap items-baseline justify-center md:justify-start gap-x-3.5 sm:gap-x-4.5 gap-y-2.5 sm:gap-y-0">
+              <li
+                data-gradient-item="1"
+                className="hero-gradient-item font-syncopate text-[clamp(1.85rem,4.8vw,3.5rem)] font-bold leading-[1.15] sm:leading-[1.05] md:leading-[0.95] tracking-tight w-fit list-none p-0 m-0 cursor-default transition-transform duration-[480ms] ease-[cubic-bezier(0.475,0.425,0,0.995)] hover:translate-x-[0.3ch]"
+              >
+                {firstName}
+              </li>
+              {lastName && (
+                <li
+                  data-gradient-item="2"
+                  className="hero-gradient-item font-syncopate text-[clamp(1.85rem,4.8vw,3.5rem)] font-bold leading-[1.15] sm:leading-[1.05] md:leading-[0.95] tracking-tight w-fit list-none p-0 m-0 cursor-default transition-transform duration-[480ms] ease-[cubic-bezier(0.475,0.425,0,0.995)] hover:translate-x-[0.3ch]"
+                >
+                  {lastName}
+                </li>
+              )}
+            </div>
+
+            {/* Role Row: FULL-STACK DEVELOPER */}
+            <div className="flex flex-wrap items-baseline justify-center md:justify-start gap-x-3 sm:gap-x-4 gap-y-2.5 sm:gap-y-0">
+              <li
+                data-gradient-item="3"
+                className="hero-gradient-item font-syncopate text-[clamp(1.5rem,3.8vw,2.75rem)] font-bold leading-[1.15] sm:leading-[1.05] md:leading-[0.95] tracking-tight w-fit list-none p-0 m-0 cursor-default transition-transform duration-[480ms] ease-[cubic-bezier(0.475,0.425,0,0.995)] hover:translate-x-[0.3ch]"
+              >
+                {rolePrefix}
+              </li>
+              {roleSuffix && (
+                <li
+                  data-gradient-item="4"
+                  className="hero-gradient-item font-syncopate text-[clamp(1.5rem,3.8vw,2.75rem)] font-bold leading-[1.15] sm:leading-[1.05] md:leading-[0.95] tracking-tight w-fit list-none p-0 m-0 cursor-default transition-transform duration-[480ms] ease-[cubic-bezier(0.475,0.425,0,0.995)] hover:translate-x-[0.3ch]"
+                >
+                  {roleSuffix}
+                </li>
+              )}
+            </div>
+          </ul>
         </h1>
 
         {/* Subtitle Bio, CTAs & Circular Scroll Badge */}
