@@ -53,6 +53,7 @@ export const MobileMenu = ({ isOpen, onClose, activeId, onItemClick }) => {
       role="dialog"
       aria-modal="true"
       aria-label="Mobile Navigation"
+      data-lenis-prevent
     >
       {/* Dimmed backdrop */}
       <div
@@ -65,6 +66,7 @@ export const MobileMenu = ({ isOpen, onClose, activeId, onItemClick }) => {
       <div
         ref={menuRef}
         className="relative z-50 mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-black/[0.08] bg-white/95 p-5 shadow-2xl backdrop-blur-2xl transition-all duration-300"
+        data-lenis-prevent
       >
         {/* Top Header inside Menu with live green dot */}
         <div className="flex items-center justify-between border-b border-black/[0.06] pb-3">

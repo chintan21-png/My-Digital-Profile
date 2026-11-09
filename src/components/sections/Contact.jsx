@@ -181,11 +181,13 @@ export const Contact = () => {
           <div
             className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-neutral-950/50 backdrop-blur-sm transition-opacity animate-fadeIn"
             onClick={handleCloseModal}
+            data-lenis-prevent
           >
             {/* Modal Dialog Card (White & Light Theme) */}
             <div
               className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-neutral-200/90 bg-white p-6 sm:p-8 shadow-2xl text-left"
               onClick={(e) => e.stopPropagation()}
+              data-lenis-prevent
             >
               {/* Vibrant blue accent line on top */}
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-[#3B5BFF] to-blue-400" />
