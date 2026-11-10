@@ -406,7 +406,10 @@ export const Hero = () => {
 
               <a
                 data-testid="hero-download-cv"
-                href="#contact"
+                href={hero?.resumeUrl || "/Chintan_Nakum_Resume.pdf"}
+                download="Chintan_Nakum_Resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group inline-flex items-center justify-center gap-3 rounded-full border border-black/15 bg-white/70 px-8 py-4 font-cabinet text-xs font-bold uppercase tracking-[0.16em] text-zinc-800 backdrop-blur transition-all duration-300 hover:border-[#3B5BFF] hover:text-[#3B5BFF] w-full max-w-xs sm:w-auto text-center"
               >
                 <span>Download CV</span>

@@ -4,6 +4,7 @@ export const PORTFOLIO_DATA = {
     name: "Chintan Nakum",
     title: "Full - Stack Developer",
     bio: "Full-Stack Developer passionate about building responsive, scalable web applications using modern frontend and backend technologies.",
+    resumeUrl: "/Chintan_Nakum_Resume.pdf",
     stats: [
       { label: "Months Experience", value: "6+" },
       { label: "Completed Projects", value: "5+" },

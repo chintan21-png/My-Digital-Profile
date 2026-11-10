@@ -1,6 +1,7 @@
-import { lazy, Suspense } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { Navbar } from './components/layout/Navbar';
 import { SmoothScroll } from './components/common/SmoothScroll';
+import { Loader } from './components/common/Loader';
 
 // Lazy loading content sections for performance optimization & code-splitting
 const Hero = lazy(() => import('./components/sections/Hero'));
@@ -25,9 +26,13 @@ const SectionSkeleton = () => (
 );
 
 const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
   return (
-    <SmoothScroll>
-      <div className="min-h-screen bg-[#FAFAFA] text-neutral-900 selection:bg-[#3B5BFF]/15 selection:text-[#3B5BFF] flex flex-col font-cabinet">
+    <>
+      {isLoading && <Loader onFinish={() => setIsLoading(false)} />}
+      <SmoothScroll>
+        <div className="min-h-screen bg-[#FAFAFA] text-neutral-900 selection:bg-[#3B5BFF]/15 selection:text-[#3B5BFF] flex flex-col font-cabinet">
         {/* High-performance Navbar combining React Bits & Emergent Themes */}
         <Navbar />
 
@@ -64,6 +69,7 @@ const App = () => {
         </Suspense>
       </div>
     </SmoothScroll>
+  </>
   );
 };
 

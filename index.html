@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Developer Portfolio</title>
+    <title>Chintan Nakum — Full-Stack Developer</title>
     <!-- Cabinet Grotesk & JetBrains Mono & Instrument Serif Fonts -->
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
     <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,600,700,800,900&display=swap" />
@@ -13,7 +13,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;600;700&family=Roboto+Condensed:ital,wght@0,400;0,700;1,400;1,700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet" />
   </head>
   <body class="bg-[#FAFAFA] text-neutral-900 antialiased selection:bg-[#3B5BFF]/15 selection:text-[#3B5BFF]">
-    <div id="root"></div>
+    <div id="root">
+      <!-- Instant HTML Preloader (active while browser downloads bundles) -->
+      <div style="position:fixed;inset:0;background:#0B0C12;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:18px;">
+          <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;color:#3B5BFF;font-weight:800;font-size:20px;box-shadow:0 0 25px rgba(59,91,255,0.2);">
+            &lt;/&gt;
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#ffffff;">Chintan Nakum</div>
+            <div style="font-size:11px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-top:4px;">Digital Portfolio · Launching</div>
+          </div>
+          <div style="width:160px;height:2px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;position:relative;margin-top:8px;">
+            <div style="width:40%;height:100%;background:#3B5BFF;border-radius:999px;position:absolute;box-shadow:0 0 10px #3B5BFF;animation:initLaunch 1.2s infinite ease-in-out;"></div>
+          </div>
+        </div>
+        <style>
+          @keyframes initLaunch {
+            0% { left: -40%; width: 35%; }
+            50% { left: 35%; width: 45%; }
+            100% { left: 100%; width: 35%; }
+          }
+        </style>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
