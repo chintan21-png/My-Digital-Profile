@@ -106,7 +106,7 @@ export const Contact = () => {
   };
 
   return (
-    <section id="contact" className="py-14 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="contact" className="pt-14 pb-4 sm:pt-16 sm:pb-6 lg:pt-20 lg:pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <ScrollReveal direction="up" distance="32px" duration={800}>
         <div className="relative overflow-hidden rounded-3xl border border-neutral-800/80 bg-neutral-950 p-8 sm:p-14 lg:p-20 shadow-2xl flex flex-col items-center text-center">
           {/* Lightfall WebGL background effect */}
