@@ -11,6 +11,7 @@ import {
   LuArrowDown,
 } from 'react-icons/lu';
 import { PORTFOLIO_DATA } from '../../data/portfolioData';
+import { LightLines } from '../ui/light-lines';
 
 export const Hero = () => {
   const { hero, contact } = PORTFOLIO_DATA;
@@ -186,6 +187,18 @@ export const Hero = () => {
       data-testid="hero"
       className="relative flex min-h-screen flex-col justify-center overflow-hidden font-cabinet"
     >
+      {/* Animated Light-Lines background — behind everything */}
+      <LightLines
+        className="z-0"
+        gradientFrom="#EEF2FF"
+        gradientTo="#F5F3FF"
+        lineColor="#6366f1"
+        lightColor="#6366f1"
+        linesOpacity={0.08}
+        lightsOpacity={0.55}
+        speedMultiplier={0.65}
+      />
+
       {/* Background Gradient Orbs */}
       {/* Orb 1: Soft Lavender / Periwinkle Blue at Top Left */}
       <div

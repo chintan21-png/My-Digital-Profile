@@ -1,7 +1,7 @@
 import { FiArrowUpRight } from 'react-icons/fi';
 import { PORTFOLIO_DATA } from '../../data/portfolioData';
 import { ScrollReveal } from '../common/ScrollReveal';
-import { SplitText } from '../ui/SplitText';
+import TextAnimation from '../ui/TextAnimation';
 
 export const Work = () => {
   const { projects } = PORTFOLIO_DATA;
@@ -10,32 +10,16 @@ export const Work = () => {
     <section id="work" className="py-14 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Section Header */}
       <div className="flex flex-col items-start gap-2 mb-10 sm:mb-12">
-        <SplitText
-          tag="span"
-          text="Selected Projects"
-          className="font-mono text-sm font-semibold uppercase tracking-[0.2em] text-[#3B5BFF]"
-          effect="rise"
-          splitType="chars"
-          delay={40}
-          duration={1.2}
-          staggerFrom="start"
-          trigger="view"
-          hoverEffect="lift"
-          textAlign="left"
-        />
-        <SplitText
-          tag="h2"
-          text="Featured Work & Architecture"
-          className="font-cabinet text-4xl sm:text-5xl font-extrabold tracking-tight text-neutral-950"
-          effect="rise"
-          splitType="chars"
-          delay={35}
-          duration={1.25}
-          staggerFrom="start"
-          trigger="view"
-          hoverEffect="lift"
-          textAlign="left"
-        />
+        <span className="font-mono text-sm font-semibold uppercase tracking-[0.2em] text-[#3B5BFF]">
+          <TextAnimation delay={0} divideBy="word">
+            Selected Projects
+          </TextAnimation>
+        </span>
+        <h2 className="font-cabinet text-4xl sm:text-5xl font-extrabold tracking-tight text-neutral-950">
+          <TextAnimation delay={0.1} divideBy="word">
+            Featured Work & Architecture
+          </TextAnimation>
+        </h2>
       </div>
 
       {/* Projects Grid with staggered reveal */}
