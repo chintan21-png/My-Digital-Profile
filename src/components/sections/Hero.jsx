@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLenis } from 'lenis/react';
 import { gsap } from 'gsap';
 import { CustomEase } from 'gsap/CustomEase';
 import {
@@ -14,6 +15,31 @@ import { PORTFOLIO_DATA } from '../../data/portfolioData';
 export const Hero = () => {
   const { hero, contact } = PORTFOLIO_DATA;
   const listRef = useRef(null);
+  const lenis = useLenis();
+
+  // Smooth scroll to Work section without altering URL route/hash
+  const handleScrollToWork = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+
+    const targetElement = document.querySelector('#work');
+    if (targetElement) {
+      const navOffset = window.innerWidth < 768 ? 85 : 95;
+      if (lenis) {
+        lenis.scrollTo(targetElement, {
+          offset: -navOffset,
+          duration: 1.2,
+        });
+      } else {
+        const elementPosition = targetElement.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - navOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth',
+        });
+      }
+    }
+  };
 
   // Real-time local clock
   const [localTime, setLocalTime] = useState('');
@@ -395,7 +421,8 @@ export const Hero = () => {
               <a
                 data-testid="hero-view-work"
                 href="#work"
-                className="group inline-flex items-center justify-center gap-3 rounded-full bg-[#3B5BFF] md:bg-[#111] px-8 py-4 font-cabinet text-xs font-bold uppercase tracking-[0.16em] text-white shadow-sm shadow-[#3B5BFF]/25 md:shadow-none transition-all duration-300 hover:bg-[#2D47D6] md:hover:bg-[#3B5BFF] w-full max-w-xs sm:w-auto text-center"
+                onClick={handleScrollToWork}
+                className="group inline-flex items-center justify-center gap-3 rounded-full bg-[#3B5BFF] md:bg-[#111] px-8 py-4 font-cabinet text-xs font-bold uppercase tracking-[0.16em] text-white shadow-sm shadow-[#3B5BFF]/25 md:shadow-none transition-all duration-300 hover:bg-[#2D47D6] md:hover:bg-[#3B5BFF] w-full max-w-xs sm:w-auto text-center cursor-pointer"
               >
                 <span>View my work</span>
                 <LuAsterisk
@@ -449,6 +476,7 @@ export const Hero = () => {
           <div className="hidden md:block shrink-0">
             <a
               href="#work"
+              onClick={handleScrollToWork}
               data-testid="hero-scroll-badge"
               aria-label="Scroll to work section"
               className="group relative block size-28 lg:size-32 cursor-pointer focus:outline-none"

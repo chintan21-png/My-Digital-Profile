@@ -29,6 +29,7 @@ uniform float uHead;
 uniform float uDepth;
 uniform vec4 uMouse;
 uniform vec3 uLens;
+uniform float uReach;
 uniform float uLightMode;
 uniform float uEncode;
 out vec4 outColor;
@@ -36,7 +37,6 @@ out vec4 outColor;
 const vec3 CAMERA = vec3(0.0, -0.8888889, -0.2222222);
 const float TAU = 6.28318530718;
 const float SPACING = 0.005;
-const float REACH = 0.32;
 
 uint scramble(uint x) {
   x ^= x >> 16;
@@ -67,11 +67,12 @@ void main() {
   vec2 screen = (2.0 * frag - uView) / uView.x;
   vec2 p = screen;
   mat2 warp = mat2(1.0);
+  float reach = uReach > 0.0 ? uReach : 0.32;
   if (uLens.z > 0.0) {
     vec2 o = p - uLens.xy;
-    float e = uLens.z * exp(-dot(o, o) / (REACH * REACH));
+    float e = uLens.z * exp(-dot(o, o) / (reach * reach));
     p -= o * e;
-    warp = mat2(1.0 - e) + outerProduct(o, o) * (2.0 * e / (REACH * REACH));
+    warp = mat2(1.0 - e) + outerProduct(o, o) * (2.0 * e / (reach * reach));
   }
 
   vec3 dir = vec3(p, uZoom);
@@ -142,9 +143,9 @@ void main() {
       float behind = max(-delta, 0.0);
       float fall = exp(-uTail * behind) * (1.0 - smoothstep(0.5, 0.95, behind / (0.5 * period)));
       fall *= 1.0 - smoothstep(1.2, 3.2, uTail * behind);
-      float reach = length(vec2(across, ahead));
-      float trail = stroke(ahead > 0.0 ? reach : abs(across), halfWidth * mix(0.4, 1.0, fall)) * fall;
-      float glint = orb(reach, headRadius) * mix(3.0, 1.8, uLightMode);
+      float reachDist = length(vec2(across, ahead));
+      float trail = stroke(ahead > 0.0 ? reachDist : abs(across), halfWidth * mix(0.4, 1.0, fall)) * fall;
+      float glint = orb(reachDist, headRadius) * mix(3.0, 1.8, uLightMode);
       float weight = mix(1.5, 1.0 + sin(uTwinkleClock + 7.0 * hue + 4.0), uTwinkle);
       weight *= 1.0 - smoothstep(0.72 * edge, edge, abs(across) / spacing);
       vec3 color = uColors[min(int(hue * float(count)), count - 1)];
@@ -463,13 +464,14 @@ const Lightfall = ({
       lensX: 0,
       lensY: 0,
       touch: 0,
-      warp: 0
+      warp: 0,
+      lastInteractionTime: -10
     };
     let raf = 0;
     let last = 0;
     let visible = true;
 
-    const render = () => {
+    const render = (mobile = false) => {
       const s = settingsRef.current;
       const width = canvas.width;
       const height = canvas.height;
@@ -498,15 +500,22 @@ const Lightfall = ({
       const toScreenX = value => (2 * value - width) / width;
       const toScreenY = value => (2 * value - height) / width;
 
+      // On desktop: EXACT original values (zoom = s.zoom, reach = 0.32, streakCount = s.streakCount)
+      // On mobile: tuned zoom and reach so the 3D curves show instead of a flat vertical slice
+      const effectiveZoom = mobile ? Math.max(1.85, s.zoom * 0.65) : s.zoom;
+      const effectiveReach = mobile ? 0.60 : 0.32;
+      const effectiveStreakCount = mobile ? Math.max(s.streakCount, 4) : s.streakCount;
+
       const r = pass(scene, streakProgram);
       gl.uniform2f(r.uView, width, height);
-      gl.uniform1f(r.uZoom, s.zoom);
+      gl.uniform1f(r.uZoom, effectiveZoom);
+      gl.uniform1f(r.uReach, effectiveReach);
       gl.uniform1f(r.uPhase, clock % (16 * period));
       gl.uniform1f(r.uTwinkleClock, clock % TAU);
       gl.uniform1f(r.uRings, rings);
       gl.uniform3fv(r.uColors, palette);
       gl.uniform1i(r.uColorCount, list.length);
-      gl.uniform1i(r.uStreakCount, s.streakCount);
+      gl.uniform1i(r.uStreakCount, effectiveStreakCount);
       gl.uniform1i(r.uColumns, s.streakWidth > 1 ? 2 : 1);
       gl.uniform1f(r.uWidth, 5e-4 * s.streakWidth);
       gl.uniform1f(r.uTail, 19 / (s.streakLength * stretch));
@@ -588,33 +597,103 @@ const Lightfall = ({
       if (!s.intro || reduce) state.intro = 1;
       else if (state.intro < 1) state.intro = Math.min(1, state.intro + dt / INTRO_SECONDS);
 
-      const holding = s.holdToWarp && pointer.held && pointer.inside && !reduce;
+      const cssWidth = Math.max(1, container.clientWidth);
+      const isMobile = cssWidth < 768 || (typeof window !== 'undefined' && window.innerWidth < 768);
+      const ratio = canvas.width / cssWidth;
+
+      if (!isMobile) {
+        // ===============================================
+        // DESKTOP: 100% UNCHANGED, EXACT ORIGINAL LOGIC
+        // ===============================================
+        const holding = s.holdToWarp && pointer.held && pointer.inside && !reduce;
+        state.warp += ((holding ? 1 : 0) - state.warp) * (1 - Math.exp(-dt * (holding ? 2.2 : 1.6)));
+        const rush = WARP_SPEED * Math.pow(1 - state.intro, 2) + 6 * state.warp;
+        const running = !s.paused && !reduce;
+        if (running) state.travel += dt * 0.1 * s.speed * (1 + rush);
+
+        const targetX = pointer.x * ratio;
+        const targetY = (container.clientHeight - pointer.y) * ratio;
+        const engaged = s.mouseInteraction && pointer.inside && !reduce;
+        if (engaged && state.touch < 0.01) {
+          state.mouseX = targetX;
+          state.mouseY = targetY;
+          state.lensX = targetX;
+          state.lensY = targetY;
+        }
+        const follow = s.mouseDampening > 0 ? 1 - Math.exp(-dt / s.mouseDampening) : 1;
+        state.mouseX += (targetX - state.mouseX) * follow;
+        state.mouseY += (targetY - state.mouseY) * follow;
+        const lensFollow = 1 - Math.exp(-dt * 6);
+        state.lensX += (targetX - state.lensX) * lensFollow;
+        state.lensY += (targetY - state.lensY) * lensFollow;
+        state.touch += ((engaged ? 1 : 0) - state.touch) * (1 - Math.exp(-dt * (engaged ? 4 : 2)));
+
+        render(false);
+
+        const settling = state.intro < 1 || state.warp > 0.001 || Math.abs((engaged ? 1 : 0) - state.touch) > 0.002;
+        if ((running && s.speed !== 0) || settling) raf = requestAnimationFrame(frame);
+        else last = 0;
+        return;
+      }
+
+      // ===============================================
+      // MOBILE: FLUID CURVES & AMBIENT DRIFT
+      // ===============================================
+      const nowSec = now * 0.001;
+      const userEngaged = s.mouseInteraction && pointer.inside && !reduce;
+
+      let targetX, targetY, targetTouch, targetHolding;
+
+      if (userEngaged) {
+        state.lastInteractionTime = nowSec;
+        targetX = pointer.x * ratio;
+        targetY = (container.clientHeight - pointer.y) * ratio;
+        targetTouch = 1.0;
+        targetHolding = s.holdToWarp && pointer.held && !reduce;
+      } else {
+        // Automated ambient "invisible hand" drift on mobile:
+        // Continuously sweeps in fluid curves across the mobile screen so streaks dynamically bend
+        const timeSince = nowSec - state.lastInteractionTime;
+        const ambientFadeIn = Math.min(1, Math.max(0, timeSince - 0.3) / 1.0);
+
+        // Periodically trigger a gentle surge of light down the lanes (every ~8-10 seconds)
+        const surgeWave = Math.sin(nowSec * 0.7);
+        const ambientSurge = Math.pow(Math.max(0, surgeWave), 8) * 0.45;
+
+        // Wandering coordinate path
+        const normX = 0.5 + 0.35 * Math.sin(nowSec * 0.82) + 0.12 * Math.sin(nowSec * 1.75);
+        const normY = 0.5 + 0.28 * Math.cos(nowSec * 0.64) + 0.1 * Math.cos(nowSec * 1.38);
+
+        targetX = normX * container.clientWidth * ratio;
+        targetY = normY * container.clientHeight * ratio;
+        targetTouch = 0.9 * ambientFadeIn;
+        targetHolding = ambientSurge > 0.08 && !reduce;
+      }
+
+      const holding = targetHolding;
       state.warp += ((holding ? 1 : 0) - state.warp) * (1 - Math.exp(-dt * (holding ? 2.2 : 1.6)));
       const rush = WARP_SPEED * Math.pow(1 - state.intro, 2) + 6 * state.warp;
       const running = !s.paused && !reduce;
       if (running) state.travel += dt * 0.1 * s.speed * (1 + rush);
 
-      const ratio = canvas.width / Math.max(1, container.clientWidth);
-      const targetX = pointer.x * ratio;
-      const targetY = (container.clientHeight - pointer.y) * ratio;
-      const engaged = s.mouseInteraction && pointer.inside && !reduce;
-      if (engaged && state.touch < 0.01) {
+      if (state.touch < 0.01) {
         state.mouseX = targetX;
         state.mouseY = targetY;
         state.lensX = targetX;
         state.lensY = targetY;
       }
+
       const follow = s.mouseDampening > 0 ? 1 - Math.exp(-dt / s.mouseDampening) : 1;
       state.mouseX += (targetX - state.mouseX) * follow;
       state.mouseY += (targetY - state.mouseY) * follow;
       const lensFollow = 1 - Math.exp(-dt * 6);
       state.lensX += (targetX - state.lensX) * lensFollow;
       state.lensY += (targetY - state.lensY) * lensFollow;
-      state.touch += ((engaged ? 1 : 0) - state.touch) * (1 - Math.exp(-dt * (engaged ? 4 : 2)));
+      state.touch += (targetTouch - state.touch) * (1 - Math.exp(-dt * (userEngaged ? 4 : 2.5)));
 
-      render();
+      render(true);
 
-      const settling = state.intro < 1 || state.warp > 0.001 || Math.abs((engaged ? 1 : 0) - state.touch) > 0.002;
+      const settling = state.intro < 1 || state.warp > 0.001 || Math.abs(targetTouch - state.touch) > 0.002;
       if ((running && s.speed !== 0) || settling) raf = requestAnimationFrame(frame);
       else last = 0;
     };
@@ -630,7 +709,7 @@ const Lightfall = ({
       const ratio = Math.min(s.dpr || window.devicePixelRatio || 1, 2);
       canvas.width = Math.max(1, Math.round(width * ratio));
       canvas.height = Math.max(1, Math.round(height * ratio));
-      if (!raf) render();
+      if (!raf) render(width < 768);
       wake();
     };
 
@@ -670,6 +749,39 @@ const Lightfall = ({
       wake();
     };
 
+    const onTouchStart = event => {
+      if (event.touches && event.touches.length > 0) {
+        const touch = event.touches[0];
+        const point = locate(touch);
+        if (!point.inside) return;
+        pointer.x = point.x;
+        pointer.y = point.y;
+        pointer.inside = true;
+        pointer.held = true;
+        wake();
+      }
+    };
+
+    const onTouchMove = event => {
+      if (event.touches && event.touches.length > 0) {
+        const touch = event.touches[0];
+        const point = locate(touch);
+        pointer.x = point.x;
+        pointer.y = point.y;
+        pointer.inside = point.inside;
+        wake();
+      }
+    };
+
+    const onTouchEnd = () => {
+      pointer.held = false;
+      setTimeout(() => {
+        pointer.inside = false;
+        wake();
+      }, 800);
+      wake();
+    };
+
     const onVisibility = () => {
       last = 0;
       wake();
@@ -689,6 +801,10 @@ const Lightfall = ({
     window.addEventListener('pointerdown', onPointerDown, { passive: true });
     window.addEventListener('pointerup', onPointerUp, { passive: true });
     window.addEventListener('pointercancel', onPointerUp, { passive: true });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', onTouchEnd, { passive: true });
     document.documentElement.addEventListener('pointerleave', onPointerLeave);
     document.addEventListener('visibilitychange', onVisibility);
     resize();
@@ -701,7 +817,7 @@ const Lightfall = ({
         resize();
         return;
       }
-      if (!raf) render();
+      if (!raf) render(container.clientWidth < 768);
       wake();
     };
 
@@ -716,6 +832,10 @@ const Lightfall = ({
       window.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
       document.documentElement.removeEventListener('pointerleave', onPointerLeave);
       document.removeEventListener('visibilitychange', onVisibility);
       [scene, ...levels.flat()].forEach(target => {
