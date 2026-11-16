@@ -44,9 +44,9 @@ export const Footer = () => {
       <div className="relative w-full h-[140px] sm:h-[180px] md:h-[220px] lg:h-[260px] select-none flex items-center justify-center">
         <TechText
           text={NAV_BRAND.name.toUpperCase().replace(' ', '\u00A0\u00A0\u00A0')}
-          fontFamily="'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, sans-serif"
-          fontWeight={800}
-          fontSize={150}
+          fontFamily="'Panchang', -apple-system, BlinkMacSystemFont, sans-serif"
+          fontWeight={500}
+          fontSize={160}
           letterSpacing={0}
           color="#0B0C12"
           accentColor="#3B5BFF"

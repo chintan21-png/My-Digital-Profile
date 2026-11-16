@@ -2,7 +2,7 @@ export const PORTFOLIO_DATA = {
   hero: {
     greeting: "Hi, I am",
     name: "Chintan Nakum",
-    title: "Full - Stack Developer",
+    title: "Full Stack Developer",
     bio: "Full-Stack Developer passionate about building responsive, scalable web applications using modern frontend and backend technologies.",
     resumeUrl: "/Chintan_Nakum_Resume.pdf",
     stats: [
@@ -16,6 +16,10 @@ export const PORTFOLIO_DATA = {
       title: "Bizconnect E-Commerce Platform",
       category: "Full Stack / E-Commerce",
       description: "Developed a dynamic e-commerce storefront template with reusable UI components, API-driven product management, and seamless shopping experiences. Integrated TanStack Query for efficient server-state management, caching, and optimized API interactions.",
+      highlights: [
+        "dynamic e-commerce storefront template",
+        "TanStack Query for efficient server-state management, caching, and optimized API interactions",
+      ],
       tags: ["React", "TanStack Query", "Tailwind CSS", "Axios", "REST APIs", "Framer Motion"],
       link: "https://bizconnect.in/",
     },
@@ -24,6 +28,10 @@ export const PORTFOLIO_DATA = {
       title: "Taskfyer — Task Management System",
       category: "Full Stack / MERN",
       description: "Developed a full-stack task management system with authentication, real-time updates, and admin reporting tools for tracking employees and task assignments efficiently.",
+      highlights: [
+        "full-stack task management system",
+        "authentication, real-time updates, and admin reporting tools",
+      ],
       tags: ["React", "Node.js", "Express.js", "MongoDB", "JWT", "Tailwind CSS"],
       link: "https://github.com/chintan21-png/task-manager-app",
     },
@@ -32,6 +40,11 @@ export const PORTFOLIO_DATA = {
       title: "Premier Zone — Backend Project",
       category: "Backend / REST API",
       description: "Developed a backend application for managing and retrieving Premier League player statistics using Spring Boot and PostgreSQL. Implemented CSV-based data import and RESTful APIs to efficiently store, retrieve, and organize player information.",
+      highlights: [
+        "managing and retrieving Premier League player statistics",
+        "Spring Boot and PostgreSQL",
+        "CSV-based data import and RESTful APIs",
+      ],
       tags: ["Java", "Spring Boot", "PostgreSQL", "REST APIs", "CSV Processing"],
       link: "https://github.com/chintan21-png/premier_zone",
     },
@@ -63,6 +76,10 @@ export const PORTFOLIO_DATA = {
       company: "Softcoding Solution",
       description:
         "Developed a fully dynamic e-commerce storefront for Bizconnect using React, integrating APIs for products, categories, shopping cart, orders, and other store functionalities. Implemented TanStack Query for server-state management, intelligent caching, and query optimization, reducing redundant API requests and improving data loading and user experience.",
+      highlights: [
+        "dynamic e-commerce storefront for Bizconnect",
+        "TanStack Query for server-state management, intelligent caching, and query optimization",
+      ],
       technologies: ["React", "TanStack Query", "REST APIs", "Caching"],
     },
     {
@@ -71,6 +88,10 @@ export const PORTFOLIO_DATA = {
       company: "Remote Workshop",
       description:
         "Completed a hands-on remote development workshop by building Taskfyer, a full-stack task management application using the MERN stack. Implemented JWT authentication, role-based access control, REST APIs, real-time task updates, and Excel-based admin reporting.",
+      highlights: [
+        "Taskfyer, a full-stack task management application",
+        "JWT authentication, role-based access control, REST APIs",
+      ],
       technologies: ["MERN Stack", "JWT Auth", "Node.js", "REST APIs"],
     },
   ],

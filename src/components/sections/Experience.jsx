@@ -2,6 +2,39 @@ import { useState, useEffect, useRef } from 'react';
 import { PORTFOLIO_DATA } from '../../data/portfolioData';
 import { ScrollReveal } from '../common/ScrollReveal';
 
+// Helper to highlight key points in description with italic and brand color
+const renderHighlightedDescription = (text, highlights = []) => {
+  if (!text) return null;
+  if (!highlights || highlights.length === 0) return text;
+
+  const escaped = highlights
+    .filter(Boolean)
+    .map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+  if (escaped.length === 0) return text;
+
+  const regex = new RegExp(`(${escaped.join('|')})`, 'gi');
+  const parts = text.split(regex);
+
+  return parts.map((part, index) => {
+    const isHighlight = highlights.some(
+      (h) => h.toLowerCase() === part.toLowerCase()
+    );
+
+    if (isHighlight) {
+      return (
+        <span
+          key={index}
+          className="italic font-medium text-[#3B5BFF] transition-colors"
+        >
+          {part}
+        </span>
+      );
+    }
+    return part;
+  });
+};
+
 export const Experience = () => {
   const { experience, experienceSummary } = PORTFOLIO_DATA;
 
@@ -71,7 +104,7 @@ export const Experience = () => {
 
           <ScrollReveal direction="up" distance="20px" duration={700} delay={80}>
             <div>
-              <div className="mt-4 font-display text-[clamp(2.6rem,5.5vw,5rem)] font-black leading-[1.02] tracking-[-0.03em] text-[#111]">
+              <div className="mt-4 font-space-grotesk text-[clamp(2.6rem,5.5vw,5rem)] font-bold leading-[1.02] tracking-[-0.03em] text-[#111]">
                 <span className="block overflow-hidden">
                   <span className="block will-change-transform">
                     <span>
@@ -88,7 +121,7 @@ export const Experience = () => {
 
           <ScrollReveal direction="up" distance="20px" duration={700} delay={160}>
             <div className="mt-8 max-w-sm">
-              <p className="text-base leading-relaxed text-[#555]">
+              <p className="font-space-grotesk font-medium text-base leading-relaxed text-[#555]">
                 {summary.description}
               </p>
               <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.2em] text-[#888]">
@@ -148,7 +181,7 @@ export const Experience = () => {
                       {item.period}
                     </span>
 
-                    <h3 className="mt-4 font-display text-2xl font-extrabold tracking-[-0.02em] text-[#111]">
+                    <h3 className="mt-4 font-space-grotesk text-xl sm:text-2xl font-bold tracking-tight text-[#111]">
                       {item.role}
                     </h3>
 
@@ -156,8 +189,8 @@ export const Experience = () => {
                       {item.company}
                     </p>
 
-                    <p className="mt-3 max-w-md text-sm leading-relaxed text-[#555]">
-                      {item.description}
+                    <p className="mt-3 max-w-md font-space-grotesk text-sm sm:text-[14.5px] lg:text-[15px] font-medium leading-relaxed text-[#555]">
+                      {renderHighlightedDescription(item.description, item.highlights)}
                     </p>
 
                     {tags.length > 0 && (

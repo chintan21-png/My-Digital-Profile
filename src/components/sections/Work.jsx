@@ -3,6 +3,39 @@ import { PORTFOLIO_DATA } from '../../data/portfolioData';
 import { ScrollReveal } from '../common/ScrollReveal';
 import TextAnimation from '../ui/TextAnimation';
 
+// Helper to highlight key points in description with italic and brand color
+const renderHighlightedDescription = (text, highlights = []) => {
+  if (!text) return null;
+  if (!highlights || highlights.length === 0) return text;
+
+  const escaped = highlights
+    .filter(Boolean)
+    .map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+  if (escaped.length === 0) return text;
+
+  const regex = new RegExp(`(${escaped.join('|')})`, 'gi');
+  const parts = text.split(regex);
+
+  return parts.map((part, index) => {
+    const isHighlight = highlights.some(
+      (h) => h.toLowerCase() === part.toLowerCase()
+    );
+
+    if (isHighlight) {
+      return (
+        <span
+          key={index}
+          className="italic font-medium text-[#3B5BFF] transition-colors"
+        >
+          {part}
+        </span>
+      );
+    }
+    return part;
+  });
+};
+
 export const Work = () => {
   const { projects } = PORTFOLIO_DATA;
 
@@ -22,8 +55,8 @@ export const Work = () => {
         </h2>
       </div>
 
-      {/* Projects Grid with staggered reveal */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Projects Grid with staggered reveal — 3 columns for medium and up */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
         {projects.map((project, idx) => (
           <ScrollReveal
             key={project.id}
@@ -33,9 +66,9 @@ export const Work = () => {
             delay={idx * 120}
             className="h-full"
           >
-            <article className="group relative flex h-full flex-col justify-between rounded-3xl border border-neutral-200/90 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-neutral-300 hover:shadow-soft-lg">
+            <article className="group relative flex h-full flex-col justify-between rounded-3xl border border-neutral-200/90 bg-white p-6 sm:p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-neutral-300 hover:shadow-soft-lg">
               <div>
-                {/* Category pill */}
+                {/* Category pill & link */}
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-neutral-500">
                     {project.category}
@@ -51,12 +84,12 @@ export const Work = () => {
                   </a>
                 </div>
 
-                {/* Title & Description */}
-                <h3 className="mt-4 font-cabinet text-xl font-bold text-[#3B5BFF] md:text-neutral-950 md:group-hover:text-[#3B5BFF] transition-colors">
+                {/* Title & Description with Space Grotesk */}
+                <h3 className="mt-4 font-space-grotesk text-xl sm:text-2xl lg:text-[23px] xl:text-[25px] font-bold leading-snug tracking-tight text-[#3B5BFF] md:text-neutral-950 md:group-hover:text-[#3B5BFF] transition-colors">
                   {project.title}
                 </h3>
-                <p className="mt-2 text-sm text-neutral-600 leading-relaxed font-cabinet">
-                  {project.description}
+                <p className="mt-2.5 sm:mt-3 font-space-grotesk text-sm sm:text-[14.5px] lg:text-[15px] font-medium leading-relaxed text-neutral-600">
+                  {renderHighlightedDescription(project.description, project.highlights)}
                 </p>
               </div>
 

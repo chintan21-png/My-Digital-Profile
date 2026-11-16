@@ -1,4 +1,6 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,700;1,400;1,700&family=Syncopate:wght@400;700&display=swap");
+@import url("https://api.fontshare.com/v2/css?f[]=clash-grotesk@200,300,400,500,600,700&display=swap");
 @import 'tailwindcss';
 
 @theme {
@@ -7,14 +9,18 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-syncopate: 'Syncopate', sans-serif;
   --font-roboto-condensed: 'Roboto Condensed', sans-serif;
+  --font-sora: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-panchang: 'Panchang', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-space-grotesk: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-clash-grotesk: 'Clash Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --color-accent: #3b5bff;
   --color-accent-hover: #2d47d6;
 }
 
 :root {
   font-family: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --hero-color-active: #111416;
-  --hero-color-start: #d4d4d8;
+  --hero-color-active: #ffffff;
+  --hero-color-start: rgba(255, 255, 255, 0.75);
 }
 
 .dark {
@@ -22,7 +28,8 @@
   --hero-color-start: #010406;
 }
 
-html, body {
+html,
+body {
   font-family: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -43,20 +50,34 @@ html, body {
   font-family: 'Roboto Condensed', sans-serif;
 }
 
-/* Syncopate Gradient Text Animation */
+.font-sora {
+  font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-panchang {
+  font-family: 'Panchang', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-space-grotesk {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-clash-grotesk {
+  font-family: 'Clash Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Syncopate Gradient Text Animation — white theme for blue background */
 .hero-gradient-item {
   --color-hover: #fad089;
-  --color-active: var(--hero-color-active, #111416);
-  --color-start: var(--hero-color-start, #d4d4d8);
+  --color-active: var(--hero-color-active, #ffffff);
+  --color-start: var(--hero-color-start, rgba(255, 255, 255, 0.80));
   --stop-hover: 0%;
   --stop-active: 0%;
-  background: linear-gradient(
-    90deg,
-    var(--color-hover) var(--stop-hover),
-    var(--color-active) var(--stop-hover),
-    var(--color-active) var(--stop-active),
-    var(--color-start) var(--stop-active)
-  );
+  background: linear-gradient(90deg,
+      var(--color-hover) var(--stop-hover),
+      var(--color-active) var(--stop-hover),
+      var(--color-active) var(--stop-active),
+      var(--color-start) var(--stop-active));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -133,10 +154,13 @@ html, body {
 
 /* Animations */
 @keyframes blink-dot {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.35;
     transform: scale(0.85);
@@ -151,6 +175,7 @@ html, body {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -161,18 +186,24 @@ html, body {
 }
 
 @keyframes float-badge-1 {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-6px);
   }
 }
 
 @keyframes float-badge-2 {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(6px);
   }
