@@ -46,14 +46,14 @@ export const About = () => {
             // thresholds so words are not stuck invisible when the description
             // fills most of the screen.
             const startFraction = isMobile ? 0.95 : 0.82;
-            const endFraction   = isMobile ? 0.10 : 0.20;
+            const endFraction = isMobile ? 0.10 : 0.20;
 
             const startY = windowHeight * startFraction;
-            const endY   = windowHeight * endFraction;
+            const endY = windowHeight * endFraction;
             // Add a fraction of the element's own height for a gradual wave
             const distance = (startY - endY) + rect.height * (isMobile ? 0.6 : 0.4);
 
-            const current  = startY - rect.top;
+            const current = startY - rect.top;
             const progress = Math.min(1, Math.max(0, current / distance));
             setScrollProgress(progress);
           }

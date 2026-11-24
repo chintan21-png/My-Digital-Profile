@@ -167,15 +167,13 @@ export const Experience = () => {
             return (
               <div
                 key={idx}
-                className={`relative pb-14 pl-8 sm:pl-10 md:w-1/2 md:pl-0 last:pb-0 ${
-                  isEven ? 'md:pr-14' : 'md:ml-auto md:pl-14'
-                }`}
+                className={`relative pb-14 pl-8 sm:pl-10 md:w-1/2 md:pl-0 last:pb-0 ${isEven ? 'md:pr-14' : 'md:ml-auto md:pl-14'
+                  }`}
               >
                 {/* Timeline Node Dot — always left-aligned on mobile */}
                 <span
-                  className={`absolute left-0 top-2 size-[11px] rounded-full border-2 border-[#3B5BFF] bg-white transition-all duration-300 ${
-                    isEven ? 'md:left-auto md:-right-[5px]' : 'md:-left-[5px]'
-                  }`}
+                  className={`absolute left-0 top-2 size-[11px] rounded-full border-2 border-[#3B5BFF] bg-white transition-all duration-300 ${isEven ? 'md:left-auto md:-right-[5px]' : 'md:-left-[5px]'
+                    }`}
                   aria-hidden="true"
                 />
 
