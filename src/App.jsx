@@ -33,43 +33,43 @@ const App = () => {
       {isLoading && <Loader onFinish={() => setIsLoading(false)} />}
       <SmoothScroll>
         <div className="min-h-screen bg-[#FAFAFA] text-neutral-900 selection:bg-[#3B5BFF]/15 selection:text-[#3B5BFF] flex flex-col font-cabinet">
-        {/* High-performance Navbar combining React Bits & Emergent Themes */}
-        <Navbar />
+          {/* High-performance Navbar combining React Bits & Emergent Themes */}
+          <Navbar />
 
-        {/* Main Content Sections with Lazy Loading & Suspense */}
-        <main className="flex-1">
-          <Suspense fallback={<SectionSkeleton />}>
-            <Hero />
+          {/* Main Content Sections with Lazy Loading & Suspense */}
+          <main className="flex-1">
+            <Suspense fallback={<SectionSkeleton />}>
+              <Hero />
+            </Suspense>
+
+            <Suspense fallback={<SectionSkeleton />}>
+              <Work />
+            </Suspense>
+
+            <Suspense fallback={<SectionSkeleton />}>
+              <About />
+            </Suspense>
+
+            <Suspense fallback={<SectionSkeleton />}>
+              <Experience />
+            </Suspense>
+
+            <Suspense fallback={<SectionSkeleton />}>
+              <Skills />
+            </Suspense>
+
+            <Suspense fallback={<SectionSkeleton />}>
+              <Contact />
+            </Suspense>
+          </main>
+
+          {/* Footer */}
+          <Suspense fallback={<div className="h-24 bg-neutral-50" />}>
+            <Footer />
           </Suspense>
-
-          <Suspense fallback={<SectionSkeleton />}>
-            <Work />
-          </Suspense>
-
-          <Suspense fallback={<SectionSkeleton />}>
-            <About />
-          </Suspense>
-
-          <Suspense fallback={<SectionSkeleton />}>
-            <Experience />
-          </Suspense>
-
-          <Suspense fallback={<SectionSkeleton />}>
-            <Skills />
-          </Suspense>
-
-          <Suspense fallback={<SectionSkeleton />}>
-            <Contact />
-          </Suspense>
-        </main>
-
-        {/* Footer */}
-        <Suspense fallback={<div className="h-24 bg-neutral-50" />}>
-          <Footer />
-        </Suspense>
-      </div>
-    </SmoothScroll>
-  </>
+        </div>
+      </SmoothScroll>
+    </>
   );
 };
 

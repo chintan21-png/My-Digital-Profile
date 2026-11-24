@@ -38,27 +38,27 @@ export const Skills = () => {
 
               {/* Iridescence Interactive Background Effect — desktop only */}
               {!isMobile && (
-              <div className="absolute inset-0 pointer-events-none opacity-40 transition-opacity duration-500 group-hover:opacity-65">
-                <Iridescence
-                  color="#3b82f6"
-                  hueShift={0}
-                  saturation={1}
-                  brightness={1.5}
-                  contrast={1}
-                  speed={0.8}
-                  scale={1}
-                  detail={8}
-                  warp={1}
-                  rotation={0}
-                  mouseReact={true}
-                  amplitude={0.1}
-                  stir={0.5}
-                  sheen={0.3}
-                  clickSwirl={true}
-                  grain={0}
-                  fade={0}
-                />
-              </div>
+                <div className="absolute inset-0 pointer-events-none opacity-40 transition-opacity duration-500 group-hover:opacity-65">
+                  <Iridescence
+                    color="#3b82f6"
+                    hueShift={0}
+                    saturation={1}
+                    brightness={1.5}
+                    contrast={1}
+                    speed={0.8}
+                    scale={1}
+                    detail={8}
+                    warp={1}
+                    rotation={0}
+                    mouseReact={true}
+                    amplitude={0.1}
+                    stir={0.5}
+                    sheen={0.3}
+                    clickSwirl={true}
+                    grain={0}
+                    fade={0}
+                  />
+                </div>
               )}
 
               <div className="relative z-10 flex flex-col h-full">
