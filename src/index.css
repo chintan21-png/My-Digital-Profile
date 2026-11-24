@@ -34,6 +34,7 @@ body {
   /* Smooth native-momentum scroll as fallback if Lenis is not ready yet */
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: none;
+  overflow-x: clip;
 }
 
 /* Ensure full-width sections never create horizontal overflow on mobile */
@@ -41,11 +42,6 @@ body {
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-/* Prevent horizontal overflow blowout on small screens */
-body {
-  overflow-x: hidden;
 }
 
 /* Touch target: allow vertical scroll through scrollable areas */
@@ -307,6 +303,22 @@ section {
   animation-name: light-streak-up;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+}
+
+/* GPU-composited Work carousel progress bar */
+@keyframes work-auto-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.animate-work-progress {
+  animation-name: work-auto-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
 }
 
 /* On reduced-motion devices, skip all transitions entirely */

@@ -201,9 +201,11 @@ const PillNav = ({
   const slideRef = useRef(false);
   const pendingRef = useRef(null);
   const [selected, setSelected] = useState(defaultActiveIndex);
-  const [collapsed, setCollapsed] = useState(collapse === 'always');
+  const [autoCollapsed, setAutoCollapsed] = useState(false);
   const [open, setOpen] = useState(false);
   const [panelShown, setPanelShown] = useState(false);
+  const collapsed =
+    collapse === 'always' ? true : collapse === 'never' ? false : autoCollapsed;
 
   const controlled = activeHref !== undefined;
   const activeIndex = controlled ? items.findIndex(item => item.href === activeHref) : selected;
@@ -254,7 +256,7 @@ const PillNav = ({
 
   useEffect(() => {
     const root = rootRef.current;
-    if (!root) return undefined;
+    if (!root || collapsed) return undefined;
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     const state = {
       x0: 0,
@@ -539,18 +541,17 @@ const PillNav = ({
 
   useEffect(() => {
     settingsRef.current = settings;
-    engineRef.current?.refresh();
+    if (!collapsed) {
+      engineRef.current?.refresh();
+    }
   });
 
   useLayoutEffect(() => {
     const root = rootRef.current;
     const measureEl = measureRef.current;
     if (!root || !measureEl) return undefined;
+    if (collapse === 'always' || collapse === 'never') return undefined;
     const evaluate = () => {
-      if (collapse === 'always' || collapse === 'never') {
-        setCollapsed(collapse === 'always');
-        return;
-      }
       const parent = root.parentElement;
       if (!parent) return;
       const styles = getComputedStyle(parent);
@@ -566,7 +567,7 @@ const PillNav = ({
         : (hasLogo ? height + gap : 0) + listWidth + pad * 2;
       const next = need > available + 0.5;
       if (introRef.current && next !== collapsed) pendingRef.current = next;
-      setCollapsed(next);
+      setAutoCollapsed(next);
       if (!next) setOpen(false);
     };
     evaluate();
@@ -674,7 +675,7 @@ const PillNav = ({
   }, [open, panelShown, joined]);
 
   useEffect(() => {
-    if (!open) return undefined;
+    if (!collapsed || !open) return undefined;
     const onPointerDown = event => {
       const target = event.target;
       if (target instanceof Node && rootRef.current?.contains(target)) return;
@@ -691,7 +692,7 @@ const PillNav = ({
       document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [open]);
+  }, [collapsed, open]);
 
   const spin = event => {
     const mark = markRef.current;
@@ -744,8 +745,8 @@ const PillNav = ({
       data-layout={layout}
       data-items={itemStyle}
       data-collapsed={collapsed ? '' : undefined}
-      data-open={open ? '' : undefined}
-      data-panel={panelShown ? '' : undefined}
+      data-open={collapsed && open ? '' : undefined}
+      data-panel={collapsed && panelShown ? '' : undefined}
       style={{ ...vars, ...style }}
       aria-label={ariaLabel}
     >

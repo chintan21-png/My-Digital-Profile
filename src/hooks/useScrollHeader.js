@@ -1,32 +1,45 @@
 import { useState, useEffect } from 'react';
 
 /**
- * Hook to track scroll state for dynamic header styling
+ * Hook to track scroll state for dynamic header styling.
+ * Only triggers a React state update when crossing the threshold
+ * (unless trackScrollY is explicitly enabled).
  */
-export const useScrollHeader = (threshold = 20) => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
+export const useScrollHeader = (threshold = 20, { trackScrollY = false } = {}) => {
+  const [isScrolled, setIsScrolled] = useState(() =>
+    typeof window !== 'undefined' ? window.scrollY > threshold : false
+  );
+  const [scrollY, setScrollY] = useState(() =>
+    trackScrollY && typeof window !== 'undefined' ? window.scrollY : 0
+  );
 
   useEffect(() => {
-    let ticking = false;
+    let rafId = null;
+
+    const update = () => {
+      rafId = null;
+      const currentY = window.scrollY;
+      const nextScrolled = currentY > threshold;
+      setIsScrolled((prev) => (prev === nextScrolled ? prev : nextScrolled));
+      if (trackScrollY) {
+        setScrollY((prev) => (prev === currentY ? prev : currentY));
+      }
+    };
 
     const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentY = window.scrollY;
-          setScrollY(currentY);
-          setIsScrolled(currentY > threshold);
-          ticking = false;
-        });
-        ticking = true;
+      if (rafId === null) {
+        rafId = window.requestAnimationFrame(update);
       }
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
 
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [threshold]);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+    };
+  }, [threshold, trackScrollY]);
 
   return { isScrolled, scrollY };
 };

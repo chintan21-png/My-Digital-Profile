@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 export const useIsMobile = (breakpoint = 768) => {
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === 'undefined') return false;
-    return window.innerWidth < breakpoint;
+    return window.matchMedia(`(max-width: ${breakpoint - 1}px)`).matches;
   });
 
   useEffect(() => {
@@ -16,14 +16,22 @@ export const useIsMobile = (breakpoint = 768) => {
     const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
     const updateMatch = (e) => setIsMobile(e.matches);
 
-    setIsMobile(mql.matches);
+    const rafId = window.requestAnimationFrame(() => {
+      setIsMobile((prev) => (prev === mql.matches ? prev : mql.matches));
+    });
 
     if (mql.addEventListener) {
       mql.addEventListener('change', updateMatch);
-      return () => mql.removeEventListener('change', updateMatch);
+      return () => {
+        window.cancelAnimationFrame(rafId);
+        mql.removeEventListener('change', updateMatch);
+      };
     } else {
       mql.addListener(updateMatch);
-      return () => mql.removeListener(updateMatch);
+      return () => {
+        window.cancelAnimationFrame(rafId);
+        mql.removeListener(updateMatch);
+      };
     }
   }, [breakpoint]);
 

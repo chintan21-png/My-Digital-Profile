@@ -1,30 +1,44 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { LuArrowUp } from 'react-icons/lu';
 import { NAV_BRAND, SOCIAL_LINKS } from '../../../data/navigation';
 import TechText from '../../ui/TechText';
 
 export const Footer = () => {
   const footerRef = useRef(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const progressCircleRef = useRef(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Calculate overall page scroll progress for back-to-top circular indicator
+    let rafId = null;
+
+    const updateProgress = () => {
+      rafId = null;
+      const circle = progressCircleRef.current;
+      if (!circle) return;
+
       const totalHeight =
         document.documentElement.scrollHeight - window.innerHeight;
-      if (totalHeight > 0) {
-        const currentProgress = window.scrollY / totalHeight;
-        setScrollProgress(Math.min(Math.max(currentProgress, 0), 1));
+      const progress =
+        totalHeight > 0
+          ? Math.min(Math.max(window.scrollY / totalHeight, 0), 1)
+          : 0;
+      const dashOffset = Math.max(0, Math.min(1, 1 - progress));
+      circle.style.strokeDashoffset = dashOffset.toFixed(4);
+    };
+
+    const scheduleUpdate = () => {
+      if (rafId === null) {
+        rafId = window.requestAnimationFrame(updateProgress);
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll, { passive: true });
-    handleScroll();
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate, { passive: true });
+    updateProgress();
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -114,6 +128,7 @@ export const Footer = () => {
                 strokeWidth="2"
               />
               <circle
+                ref={progressCircleRef}
                 cx="28"
                 cy="28"
                 r="25"
@@ -122,10 +137,8 @@ export const Footer = () => {
                 strokeWidth="2"
                 strokeLinecap="round"
                 pathLength="1"
-                style={{
-                  strokeDasharray: '1, 1',
-                  strokeDashoffset: Math.max(0, Math.min(1, 1 - scrollProgress)),
-                }}
+                strokeDasharray="1, 1"
+                strokeDashoffset="1"
                 className="transition-[stroke-dashoffset] duration-150 ease-out"
               />
             </svg>

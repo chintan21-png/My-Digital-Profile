@@ -17,16 +17,30 @@ import { useScrollHeader } from '../../../hooks/useScrollHeader';
 import { NAV_LINKS, NAV_BRAND, CTA_CONFIG, SOCIAL_LINKS } from '../../../data/navigation';
 import { useLenis } from 'lenis/react';
 
+const NAV_PILL_STYLE_BASE = {
+  '--pn-dot': '#3B5BFF',
+  fontFamily: "'Cabinet Grotesk', -apple-system, sans-serif",
+};
+
+const NAV_PILL_STYLE_SCROLLED = {
+  '--pn-dot': '#3B5BFF',
+  '--pn-shadow': '0 22px 44px -18px rgba(24, 24, 27, 0.34), 0 8px 20px -8px rgba(24, 24, 27, 0.18)',
+  fontFamily: "'Cabinet Grotesk', -apple-system, sans-serif",
+};
+
 export const Navbar = () => {
   const { isScrolled } = useScrollHeader(25);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia('(max-width: 767px)').matches
+      : false
+  );
   const lenis = useLenis();
 
   // Responsive breakpoint detector for mobile navigation view
   useEffect(() => {
     const mql = window.matchMedia('(max-width: 767px)');
-    const updateMobile = () => setIsMobile(mql.matches);
-    updateMobile();
+    const updateMobile = (e) => setIsMobile(e.matches);
     mql.addEventListener('change', updateMobile);
     return () => mql.removeEventListener('change', updateMobile);
   }, []);
@@ -193,11 +207,18 @@ export const Navbar = () => {
     [handleScrollTo]
   );
 
+  const handleNavItemClick = useCallback(
+    (item, _index, e) => {
+      handleScrollTo(e, item.href);
+    },
+    [handleScrollTo]
+  );
+
   return (
     <header
       aria-label="Primary"
       data-testid="navbar"
-      className="fixed inset-x-0 top-0 z-[100] flex justify-center px-4 pt-3.5 pointer-events-none sm:px-6 sm:pt-4 transition-all duration-300"
+      className="fixed inset-x-0 top-0 z-[100] flex justify-center px-4 pt-3.5 pointer-events-none sm:px-6 sm:pt-4"
     >
       <PillNav
         logo={brandLogo}
@@ -216,16 +237,11 @@ export const Navbar = () => {
         stretch={0.5}
         intro={true}
         collapse={isMobile ? 'always' : 'auto'}
-        onItemClick={(item, index, e) => handleScrollTo(e, item.href)}
+        onItemClick={handleNavItemClick}
         linkComponent={CustomNavLink}
         panelFooter={renderPanelFooter}
-        className={`pointer-events-auto transition-shadow duration-300 max-w-md w-full sm:max-w-none sm:w-auto ${
-          isScrolled ? 'shadow-soft-lg' : 'shadow-soft'
-        }`}
-        style={{
-          '--pn-dot': '#3B5BFF',
-          fontFamily: "'Cabinet Grotesk', -apple-system, sans-serif",
-        }}
+        className="pointer-events-auto max-w-md w-full sm:max-w-none sm:w-auto"
+        style={isScrolled ? NAV_PILL_STYLE_SCROLLED : NAV_PILL_STYLE_BASE}
       />
     </header>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { FiArrowUpRight } from 'react-icons/fi';
@@ -106,44 +106,47 @@ const CARD_THEMES = [
   },
 ];
 
-const CardBackdrop = ({
+// Soft radial glows without CSS filter: blur() so mobile GPUs avoid offscreen blur passes
+const CardBackdrop = memo(function CardBackdrop({
   theme,
   compact = false,
   topGlowOpacity = 'opacity-80',
   bottomGlowOpacity = 'opacity-70',
-}) => (
-  <>
-    {/* Ambient Top-Right Radial Glow */}
-    <div
-      className={`pointer-events-none absolute rounded-full bg-gradient-to-br ${theme.topGlow} transition-opacity duration-500 ${
-        compact
-          ? `-top-16 -right-16 h-36 w-36 blur-xl ${topGlowOpacity}`
-          : `-top-24 -right-24 h-56 w-56 blur-2xl ${topGlowOpacity}`
-      }`}
-      aria-hidden="true"
-    />
+}) {
+  return (
+    <>
+      {/* Ambient Top-Right Radial Glow */}
+      <div
+        className={`pointer-events-none absolute rounded-full bg-radial ${theme.topGlow} to-70% transition-opacity duration-500 ${
+          compact
+            ? `-top-20 -right-20 h-48 w-48 ${topGlowOpacity}`
+            : `-top-28 -right-28 h-72 w-72 ${topGlowOpacity}`
+        }`}
+        aria-hidden="true"
+      />
 
-    {/* Ambient Bottom-Left Radial Glow */}
-    <div
-      className={`pointer-events-none absolute rounded-full bg-gradient-to-tr ${theme.bottomGlow} transition-opacity duration-500 ${
-        compact
-          ? `-bottom-14 -left-14 h-32 w-32 blur-xl ${bottomGlowOpacity}`
-          : `-bottom-20 -left-20 h-48 w-48 blur-2xl ${bottomGlowOpacity}`
-      }`}
-      aria-hidden="true"
-    />
+      {/* Ambient Bottom-Left Radial Glow */}
+      <div
+        className={`pointer-events-none absolute rounded-full bg-radial ${theme.bottomGlow} to-70% transition-opacity duration-500 ${
+          compact
+            ? `-bottom-16 -left-16 h-40 w-40 ${bottomGlowOpacity}`
+            : `-bottom-24 -left-24 h-64 w-64 ${bottomGlowOpacity}`
+        }`}
+        aria-hidden="true"
+      />
 
-    {/* Architectural Micro Dot-Grid Pattern */}
-    <div
-      className={`pointer-events-none absolute inset-0 bg-[radial-gradient(#000_1px,transparent_1px)] ${
-        compact
-          ? 'opacity-[0.04] [background-size:14px_14px]'
-          : 'opacity-[0.035] [background-size:16px_16px]'
-      }`}
-      aria-hidden="true"
-    />
-  </>
-);
+      {/* Architectural Micro Dot-Grid Pattern */}
+      <div
+        className={`pointer-events-none absolute inset-0 bg-[radial-gradient(#000_1px,transparent_1px)] ${
+          compact
+            ? 'opacity-[0.04] [background-size:14px_14px]'
+            : 'opacity-[0.035] [background-size:16px_16px]'
+        }`}
+        aria-hidden="true"
+      />
+    </>
+  );
+});
 
 // Helper to highlight key points in description with italic and matching theme color
 const renderHighlightedDescription = (
@@ -185,15 +188,27 @@ const renderHighlightedDescription = (
 const getProjectTheme = (project, index) =>
   project?.theme || CARD_THEMES[index % CARD_THEMES.length];
 
-const ProjectDetailBody = ({
+const ProjectDetailBody = memo(function ProjectDetailBody({
   project,
   theme,
   index,
   total,
   compact = false,
+  isActive = true,
+  animateDot = true,
   footerEnd = null,
-}) => {
+}) {
   const isRepoLink = project.link?.includes('github.com');
+
+  const highlightedDescription = useMemo(
+    () =>
+      renderHighlightedDescription(
+        project.description,
+        project.highlights,
+        theme.highlightColor
+      ),
+    [project.description, project.highlights, theme.highlightColor]
+  );
 
   return (
     <>
@@ -207,7 +222,9 @@ const ProjectDetailBody = ({
               }`}
             >
               <span
-                className={`h-1.5 w-1.5 rounded-full ${theme.categoryDot} mr-1.5 animate-pulse`}
+                className={`h-1.5 w-1.5 rounded-full ${theme.categoryDot} mr-1.5 ${
+                  animateDot ? 'animate-pulse' : ''
+                }`}
               />
               {project.category}
             </span>
@@ -222,6 +239,7 @@ const ProjectDetailBody = ({
             href={project.link}
             target="_blank"
             rel="noreferrer"
+            tabIndex={isActive ? undefined : -1}
             aria-label={`View code and live project for ${project.title}`}
             className={`flex h-9 w-9 min-h-[36px] min-w-[36px] items-center justify-center rounded-full transition-all duration-300 active:scale-95 group/link ${theme.button}`}
           >
@@ -243,11 +261,7 @@ const ProjectDetailBody = ({
             compact ? 'mt-2.5 text-sm sm:text-[15px]' : 'mt-4 text-[15px]'
           }`}
         >
-          {renderHighlightedDescription(
-            project.description,
-            project.highlights,
-            theme.highlightColor
-          )}
+          {highlightedDescription}
         </p>
 
         {/* Tech Stack Tags */}
@@ -261,7 +275,7 @@ const ProjectDetailBody = ({
             {project.tags.map((tag) => (
               <span
                 key={tag}
-                className={`rounded-lg border px-2.5 py-1 font-mono font-medium tracking-wide shadow-xs transition-all duration-200 active:scale-95 ${theme.tag} ${
+                className={`rounded-lg border px-2.5 py-1 font-mono font-medium tracking-wide shadow-xs transition-colors duration-200 ${theme.tag} ${
                   compact ? 'text-[10px]' : 'text-[10.5px]'
                 }`}
               >
@@ -282,6 +296,7 @@ const ProjectDetailBody = ({
           href={project.link}
           target="_blank"
           rel="noreferrer"
+          tabIndex={isActive ? undefined : -1}
           className={`inline-flex items-center gap-2 rounded-full font-mono font-semibold uppercase tracking-[0.14em] shadow-sm transition-all duration-200 active:scale-95 ${theme.ctaButton} ${
             compact ? 'px-4 py-2 text-[10.5px]' : 'px-5 py-2.5 text-[11px]'
           }`}
@@ -294,9 +309,15 @@ const ProjectDetailBody = ({
       </div>
     </>
   );
-};
+});
 
-const AutoAdvanceBar = ({ activeKey, isPaused, theme, show }) => {
+// Pure CSS GPU-composited progress bar (zero Framer Motion JS animation overhead)
+const AutoAdvanceBar = memo(function AutoAdvanceBar({
+  activeKey,
+  isRunning,
+  theme,
+  show,
+}) {
   if (!show) return null;
 
   return (
@@ -304,49 +325,57 @@ const AutoAdvanceBar = ({ activeKey, isPaused, theme, show }) => {
       className="pointer-events-none absolute top-0 left-0 right-0 z-20 h-[3px] bg-black/[0.04]"
       aria-hidden="true"
     >
-      <motion.div
-        key={`${activeKey}-${isPaused ? 'paused' : 'run'}`}
-        className={`h-full origin-left ${theme.progressBar}`}
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: isPaused ? 0 : 1 }}
-        transition={{
-          duration: isPaused ? 0.2 : AUTO_ADVANCE_MS / 1000,
-          ease: 'linear',
-        }}
-      />
+      {isRunning ? (
+        <div
+          key={activeKey}
+          className={`h-full origin-left ${theme.progressBar} animate-work-progress will-change-transform`}
+          style={{ animationDuration: `${AUTO_ADVANCE_MS}ms` }}
+        />
+      ) : (
+        <div className={`h-full origin-left scale-x-0 ${theme.progressBar}`} />
+      )}
     </div>
   );
-};
+});
 
-const mobileDeckVariants = {
-  enter: (direction) => ({
-    opacity: 0,
-    x: direction >= 0 ? 44 : -44,
-    rotate: direction >= 0 ? 2 : -2,
-    scale: 0.97,
-  }),
-  center: {
-    opacity: 1,
-    x: 0,
-    rotate: 0,
-    scale: 1,
-  },
-  exit: (direction) => ({
-    opacity: 0,
-    x: direction >= 0 ? -44 : 44,
-    rotate: direction >= 0 ? -2 : 2,
-    scale: 0.97,
-  }),
-};
+// Memoized static heading so TextAnimation never re-renders on carousel slide changes
+const WorkHeading = memo(function WorkHeading() {
+  return (
+    <div className="flex flex-col items-start gap-2">
+      <span className="font-mono text-sm font-semibold uppercase tracking-[0.2em] text-[#3B5BFF]">
+        <TextAnimation delay={0} divideBy="word">
+          Selected Projects
+        </TextAnimation>
+      </span>
+      <h2 className="font-cabinet text-4xl sm:text-5xl font-extrabold tracking-tight text-neutral-950">
+        <TextAnimation delay={0.1} divideBy="word">
+          Featured Work & Architecture
+        </TextAnimation>
+      </h2>
+    </div>
+  );
+});
 
 export const Work = () => {
   const { projects = [] } = PORTFOLIO_DATA;
-  const [{ index: activeIndex, direction }, setSlideState] = useState({
+  const [{ index: activeIndex }, setSlideState] = useState({
     index: 0,
-    direction: 1,
   });
   const [isAutoPaused, setIsAutoPaused] = useState(false);
+  const [isInView, setIsInView] = useState(false);
+  const [isTabVisible, setIsTabVisible] = useState(() =>
+    typeof document === 'undefined' ? true : !document.hidden
+  );
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() =>
+    typeof window !== 'undefined'
+      ? Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
+      : false
+  );
+
+  const sectionRef = useRef(null);
   const touchStartRef = useRef(null);
+  const isTouchingRef = useRef(false);
+  const pendingAdvanceRef = useRef(false);
 
   // Desktop paired view activates at lg (>= 1024px); below lg uses the unified mobile deck
   const isCompactView = useIsMobile(1024);
@@ -356,31 +385,71 @@ export const Work = () => {
     ? Math.min(Math.max(activeIndex, 0), projects.length - 1)
     : 0;
 
-  const goToSlide = (nextIndex, explicitDirection) => {
-    setSlideState((prev) => {
-      const total = projects.length;
-      if (!total) return prev;
-      const resolved = ((nextIndex % total) + total) % total;
-      if (resolved === prev.index) return prev;
-      const dir = explicitDirection ?? (nextIndex > prev.index ? 1 : -1);
-      return { index: resolved, direction: dir };
-    });
-  };
+  const goToSlide = useCallback(
+    (nextIndex) => {
+      setSlideState((prev) => {
+        const total = projects.length;
+        if (!total) return prev;
+        const resolved = ((nextIndex % total) + total) % total;
+        if (resolved === prev.index) return prev;
+        return { index: resolved };
+      });
+    },
+    [projects.length]
+  );
 
-  // Auto-advance slides every 6.5s on both desktop and mobile; pause while interacting
+  // Pause carousel timers and animations whenever #work is off-screen or tab is hidden
   useEffect(() => {
-    if (isAutoPaused || projects.length <= 1) return;
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const node = sectionRef.current;
+    if (!node) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.05, rootMargin: '40px 0px' }
+    );
+    observer.observe(node);
+
+    const handleVisibility = () => {
+      setIsTabVisible(!document.hidden);
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    const motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    const handleMotionChange = (e) => setPrefersReducedMotion(e.matches);
+    motionQuery?.addEventListener?.('change', handleMotionChange);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibility);
+      motionQuery?.removeEventListener?.('change', handleMotionChange);
+    };
+  }, []);
+
+  const shouldAutoAdvance =
+    isInView &&
+    isTabVisible &&
+    !isAutoPaused &&
+    !prefersReducedMotion &&
+    projects.length > 1;
+
+  // Auto-advance slides every 6.5s ONLY while #work is visible in the viewport
+  useEffect(() => {
+    if (!shouldAutoAdvance) return undefined;
 
     const timer = window.setTimeout(() => {
+      if (isTouchingRef.current) {
+        pendingAdvanceRef.current = true;
+        return;
+      }
       setSlideState((prev) => ({
         index: (prev.index + 1) % projects.length,
-        direction: 1,
       }));
     }, AUTO_ADVANCE_MS);
 
     return () => window.clearTimeout(timer);
-  }, [isAutoPaused, projects.length, safeIndex]);
+  }, [shouldAutoAdvance, projects.length, safeIndex]);
 
   const carouselItems = useMemo(
     () =>
@@ -400,13 +469,9 @@ export const Work = () => {
 
   const activeProject = projects[safeIndex];
   const activeTheme = getProjectTheme(activeProject, safeIndex);
-  const nextIdx = (safeIndex + 1) % projects.length;
-  const thirdIdx = (safeIndex + 2) % projects.length;
-  const nextTheme = getProjectTheme(projects[nextIdx], nextIdx);
-  const thirdTheme = getProjectTheme(projects[thirdIdx], thirdIdx);
 
   const handleMobileTouchStart = (event) => {
-    setIsAutoPaused(true);
+    isTouchingRef.current = true;
     const touch = event.touches?.[0];
     if (touch) {
       touchStartRef.current = { x: touch.clientX, y: touch.clientY };
@@ -414,55 +479,54 @@ export const Work = () => {
   };
 
   const handleMobileTouchEnd = (event) => {
-    setIsAutoPaused(false);
+    isTouchingRef.current = false;
     const start = touchStartRef.current;
     touchStartRef.current = null;
     const touch = event.changedTouches?.[0];
-    if (!start || !touch) return;
 
-    const dx = touch.clientX - start.x;
-    const dy = touch.clientY - start.y;
+    let didSwipe = false;
+    if (start && touch) {
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
 
-    if (Math.abs(dx) > 42 && Math.abs(dx) > Math.abs(dy) * 1.2) {
-      if (dx < 0) {
-        goToSlide(safeIndex + 1, 1);
-      } else {
-        goToSlide(safeIndex - 1, -1);
+      if (Math.abs(dx) > 42 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        didSwipe = true;
+        goToSlide(dx < 0 ? safeIndex + 1 : safeIndex - 1);
       }
+    }
+
+    if (!didSwipe && pendingAdvanceRef.current && shouldAutoAdvance) {
+      pendingAdvanceRef.current = false;
+      goToSlide(safeIndex + 1);
+    } else {
+      pendingAdvanceRef.current = false;
     }
   };
 
   const handleMobileTouchCancel = () => {
-    setIsAutoPaused(false);
+    isTouchingRef.current = false;
     touchStartRef.current = null;
+    pendingAdvanceRef.current = false;
   };
 
   return (
     <section
+      ref={sectionRef}
       id="work"
-      className="py-14 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+      className="relative isolate overflow-x-clip py-14 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto [contain:layout_paint]"
     >
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 sm:mb-12">
-        <div className="flex flex-col items-start gap-2">
-          <span className="font-mono text-sm font-semibold uppercase tracking-[0.2em] text-[#3B5BFF]">
-            <TextAnimation delay={0} divideBy="word">
-              Selected Projects
-            </TextAnimation>
-          </span>
-          <h2 className="font-cabinet text-4xl sm:text-5xl font-extrabold tracking-tight text-neutral-950">
-            <TextAnimation delay={0.1} divideBy="word">
-              Featured Work & Architecture
-            </TextAnimation>
-          </h2>
-        </div>
+        <WorkHeading />
 
         <div className="flex items-center gap-3">
           {projects.length > 1 && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200/90 bg-white px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-600 shadow-xs">
               <span
                 className={`h-1.5 w-1.5 rounded-full ${
-                  isAutoPaused ? 'bg-neutral-400' : 'bg-[#3B5BFF] animate-pulse'
+                  !shouldAutoAdvance
+                    ? 'bg-neutral-400'
+                    : 'bg-[#3B5BFF] animate-pulse'
                 }`}
               />
               {isAutoPaused ? 'Paused' : 'Auto · 6.5s'}
@@ -506,7 +570,7 @@ export const Work = () => {
               <DiagonalCarousel
                 items={carouselItems}
                 activeIndex={safeIndex}
-                onActiveIndexChange={(idx) => goToSlide(idx)}
+                onActiveIndexChange={goToSlide}
                 loop
                 slideSize={250}
                 rotationStep={28}
@@ -622,7 +686,7 @@ export const Work = () => {
 
                 <AutoAdvanceBar
                   activeKey={safeIndex}
-                  isPaused={isAutoPaused}
+                  isRunning={shouldAutoAdvance}
                   theme={activeTheme}
                   show={projects.length > 1}
                 />
@@ -632,6 +696,7 @@ export const Work = () => {
                   theme={activeTheme}
                   index={safeIndex}
                   total={projects.length}
+                  animateDot={isInView}
                   footerEnd={
                     <div
                       className="flex items-center gap-1.5"
@@ -666,76 +731,88 @@ export const Work = () => {
           </ScrollReveal>
         </div>
       ) : (
-        /* Mobile / Compact Layout: Single Unified Tilted Swipe Deck */
+        /* Mobile / Compact Layout: Height-Locked GPU-Composited Stacked Swipe Deck */
         <ScrollReveal direction="up" distance="24px" duration={700}>
           <div className="mx-auto max-w-xl">
             <div
-              className="relative px-2 pt-2 pb-5"
+              className="relative overflow-x-clip px-3 pt-2 pb-6 touch-pan-y"
               onTouchStart={handleMobileTouchStart}
               onTouchEnd={handleMobileTouchEnd}
               onTouchCancel={handleMobileTouchCancel}
               onMouseEnter={() => setIsAutoPaused(true)}
               onMouseLeave={() => setIsAutoPaused(false)}
             >
-              {/* Layered Back Cards Peeking Behind Active Card */}
-              {projects.length > 2 && (
-                <div
-                  aria-hidden="true"
-                  className={`pointer-events-none absolute inset-x-4 top-4 bottom-2 rounded-3xl border ${thirdTheme.borderColor} ${thirdTheme.cardBg} opacity-55 shadow-xs transition-all duration-500 translate-y-2.5 scale-[0.93] rotate-[2.2deg]`}
-                />
-              )}
-              {projects.length > 1 && (
-                <div
-                  aria-hidden="true"
-                  className={`pointer-events-none absolute inset-x-3 top-3 bottom-3 rounded-3xl border ${nextTheme.borderColor} ${nextTheme.cardBg} opacity-80 shadow-sm transition-all duration-500 translate-y-1.5 scale-[0.965] -rotate-[1.6deg]`}
-                />
-              )}
+              {/* All cards occupy the same grid cell so height stays locked to the tallest card (0px CLS) */}
+              <div className="relative grid grid-cols-1">
+                {projects.map((project, idx) => {
+                  const total = projects.length;
+                  const offset = (idx - safeIndex + total) % total;
+                  const isActive = offset === 0;
+                  const theme = getProjectTheme(project, idx);
 
-              {/* Active Swipeable Project Card */}
-              <AnimatePresence mode="wait" custom={direction}>
-                <motion.article
-                  key={activeProject.id}
-                  custom={direction}
-                  variants={mobileDeckVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                  className={`group relative z-10 flex flex-col justify-between rounded-3xl border ${activeTheme.borderColor} ${activeTheme.cardBg} p-5 sm:p-7 shadow-md overflow-hidden`}
-                >
-                  <CardBackdrop theme={activeTheme} />
+                  let deckClasses =
+                    'pointer-events-none opacity-0 scale-[0.91] translate-y-4 z-0';
+                  if (isActive) {
+                    deckClasses =
+                      'pointer-events-auto opacity-100 scale-100 translate-y-0 rotate-0 z-20 shadow-md';
+                  } else if (offset === 1) {
+                    deckClasses =
+                      'pointer-events-none opacity-85 scale-[0.965] translate-y-2 -rotate-[1.6deg] z-10 shadow-sm';
+                  } else if (offset === 2) {
+                    deckClasses =
+                      'pointer-events-none opacity-55 scale-[0.93] translate-y-3.5 rotate-[2.2deg] z-[5] shadow-xs';
+                  }
 
-                  <AutoAdvanceBar
-                    activeKey={safeIndex}
-                    isPaused={isAutoPaused}
-                    theme={activeTheme}
-                    show={projects.length > 1}
-                  />
+                  return (
+                    <article
+                      key={project.id}
+                      aria-hidden={!isActive}
+                      inert={!isActive ? true : undefined}
+                      className={`group col-start-1 row-start-1 relative flex flex-col justify-between rounded-3xl border ${theme.borderColor} ${theme.cardBg} p-5 sm:p-7 overflow-hidden transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${deckClasses}`}
+                    >
+                      <CardBackdrop theme={theme} />
 
-                  <ProjectDetailBody
-                    project={activeProject}
-                    theme={activeTheme}
-                    index={safeIndex}
-                    total={projects.length}
-                    compact
-                    footerEnd={
-                      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-neutral-500">
-                        Swipe card →
-                      </span>
-                    }
-                  />
-                </motion.article>
-              </AnimatePresence>
+                      <AutoAdvanceBar
+                        activeKey={safeIndex}
+                        isRunning={isActive && shouldAutoAdvance}
+                        theme={theme}
+                        show={isActive && projects.length > 1}
+                      />
+
+                      <div
+                        className={`flex flex-1 flex-col justify-between transition-opacity duration-200 ${
+                          isActive ? 'opacity-100' : 'opacity-0 select-none'
+                        }`}
+                      >
+                        <ProjectDetailBody
+                          project={project}
+                          theme={theme}
+                          index={idx}
+                          total={total}
+                          compact
+                          isActive={isActive}
+                          animateDot={isActive && isInView}
+                          footerEnd={
+                            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-neutral-500">
+                              Swipe card →
+                            </span>
+                          }
+                        />
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Unified Deck Controls */}
             {projects.length > 1 && (
-              <div className="mt-3 flex justify-center">
-                <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200/90 bg-white/95 px-2 py-1 text-neutral-800 shadow-sm backdrop-blur-sm">
+              <div className="mt-2 flex justify-center">
+                <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200/90 bg-white/95 md:backdrop-blur-sm px-2 py-1 text-neutral-800 shadow-sm">
                   <button
                     type="button"
                     aria-label="Show previous project"
-                    onClick={() => goToSlide(safeIndex - 1, -1)}
+                    onClick={() => goToSlide(safeIndex - 1)}
                     className="inline-flex size-8 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-neutral-100 active:scale-95"
                   >
                     <ChevronLeft className="size-4" />
@@ -751,7 +828,7 @@ export const Work = () => {
                           aria-label={`Show project ${idx + 1}: ${project.title}`}
                           aria-current={isSelected ? 'true' : undefined}
                           onClick={() => goToSlide(idx)}
-                          className={`h-2 cursor-pointer rounded-full transition-all duration-300 ${
+                          className={`h-2 cursor-pointer rounded-full transition-[width,opacity,background-color] duration-300 ${
                             isSelected
                               ? 'w-7 bg-neutral-900 opacity-100'
                               : 'w-2 bg-neutral-400 opacity-45 hover:opacity-75'
@@ -764,7 +841,7 @@ export const Work = () => {
                   <button
                     type="button"
                     aria-label="Show next project"
-                    onClick={() => goToSlide(safeIndex + 1, 1)}
+                    onClick={() => goToSlide(safeIndex + 1)}
                     className="inline-flex size-8 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-neutral-100 active:scale-95"
                   >
                     <ChevronRight className="size-4" />

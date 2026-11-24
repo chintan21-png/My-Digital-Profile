@@ -10,7 +10,10 @@ export const useScrollSpy = (sectionIds = [], offset = 120) => {
   useEffect(() => {
     if (!sectionIds.length) return;
 
-    const handleScroll = () => {
+    let rafId = null;
+
+    const evaluate = () => {
+      rafId = null;
       const scrollPosition = window.scrollY + offset;
 
       for (let i = sectionIds.length - 1; i >= 0; i--) {
@@ -19,7 +22,7 @@ export const useScrollSpy = (sectionIds = [], offset = 120) => {
         if (element) {
           const top = element.offsetTop;
           if (scrollPosition >= top) {
-            setActiveId(id);
+            setActiveId((prev) => (prev === id ? prev : id));
             return;
           }
         }
@@ -27,14 +30,24 @@ export const useScrollSpy = (sectionIds = [], offset = 120) => {
 
       // Default to top section if above all sections
       if (window.scrollY < 100 && sectionIds.length > 0) {
-        setActiveId(sectionIds[0]);
+        const fallback = sectionIds[0];
+        setActiveId((prev) => (prev === fallback ? prev : fallback));
+      }
+    };
+
+    const handleScroll = () => {
+      if (rafId === null) {
+        rafId = window.requestAnimationFrame(evaluate);
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial check
+    evaluate(); // Initial check
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+    };
   }, [sectionIds, offset]);
 
   return activeId;
