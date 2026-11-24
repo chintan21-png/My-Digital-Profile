@@ -260,15 +260,22 @@ section {
    MOBILE PERFORMANCE & SCROLL REVEAL OPTIMISATIONS
    ============================================================ */
 
-/* Use content-visibility to skip rendering of off-screen sections
-   on the first paint — big LCP and TBT win on mobile */
-#work,
-#about,
-#experience,
-#skills,
-#contact {
-  content-visibility: auto;
-  contain-intrinsic-size: 0 600px;
+/* Iridescent fluid shimmer animation for mobile skills cards */
+@keyframes iridescent-drift {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate3d(-6%, 6%, 0) rotate(180deg) scale(1.15);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(360deg) scale(1);
+  }
+}
+
+.animate-iridescent-drift {
+  animation: iridescent-drift 14s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 /* On reduced-motion devices, skip all transitions entirely */

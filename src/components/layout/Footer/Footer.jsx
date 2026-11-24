@@ -47,7 +47,7 @@ export const Footer = () => {
           fontFamily="'Panchang', -apple-system, BlinkMacSystemFont, sans-serif"
           fontWeight={800}
           fontSize={160}
-          letterSpacing={0}
+          letterSpacing={0.08}
           color="#0B0C12"
           accentColor="#3B5BFF"
           reveal="letter"

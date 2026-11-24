@@ -504,7 +504,7 @@ const Lightfall = ({
       // On mobile: tuned zoom and reach so the 3D curves show instead of a flat vertical slice
       const effectiveZoom = mobile ? Math.max(1.85, s.zoom * 0.65) : s.zoom;
       const effectiveReach = mobile ? 0.60 : 0.32;
-      const effectiveStreakCount = mobile ? Math.max(s.streakCount, 4) : s.streakCount;
+      const effectiveStreakCount = s.streakCount;
 
       const r = pass(scene, streakProgram);
       gl.uniform2f(r.uView, width, height);
@@ -706,10 +706,11 @@ const Lightfall = ({
       const s = settingsRef.current;
       const width = Math.max(1, container.clientWidth);
       const height = Math.max(1, container.clientHeight);
-      const ratio = Math.min(s.dpr || window.devicePixelRatio || 1, 2);
+      const isMobile = width < 768;
+      const ratio = Math.min(s.dpr || (isMobile ? 1 : window.devicePixelRatio) || 1, 2);
       canvas.width = Math.max(1, Math.round(width * ratio));
       canvas.height = Math.max(1, Math.round(height * ratio));
-      if (!raf) render(width < 768);
+      if (!raf) render(isMobile);
       wake();
     };
 

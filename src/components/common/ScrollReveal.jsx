@@ -45,8 +45,6 @@ export const ScrollReveal = ({
         transitionDuration: `${duration}ms`,
         transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
         transitionDelay: `${delay}ms`,
-        // Release GPU layer once animation is done
-        willChange: isRevealed ? 'auto' : 'opacity, transform',
       }}
       {...rest}
     >

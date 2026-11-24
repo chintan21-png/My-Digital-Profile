@@ -28,7 +28,6 @@ function LenisGsapSync() {
       lenis.raf(time * 1000);
     };
     gsap.ticker.add(handleTicker);
-    gsap.ticker.lagSmoothing(0);
 
     // Expose lenis instance globally for helper access
     window.__lenis = lenis;

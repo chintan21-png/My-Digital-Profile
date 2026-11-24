@@ -26,13 +26,14 @@ export const useScrollReveal = ({
     const node = ref.current;
     if (!node) return;
 
-    // Clamp bottom margin so it never exceeds ~15 % of the viewport
-    // height — prevents elements from NEVER intersecting on short screens
-    // (e.g. landscape mobile where -50 px kills the whole trigger zone).
+    // On mobile, trigger as soon as the element reaches the bottom edge
+    // so cards don't stay hidden while scrolling.
     const safeMargin = (() => {
       if (rootMargin) return rootMargin;
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+      if (isMobile) return '0px 0px 20px 0px';
       const vh = window.innerHeight;
-      const clampedPx = Math.min(50, Math.floor(vh * 0.12));
+      const clampedPx = Math.min(30, Math.floor(vh * 0.05));
       return `0px 0px -${clampedPx}px 0px`;
     })();
 
