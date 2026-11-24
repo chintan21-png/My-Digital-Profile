@@ -519,25 +519,11 @@ export const Work = () => {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 sm:mb-12">
         <WorkHeading />
 
-        <div className="flex items-center gap-3">
-          {projects.length > 1 && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200/90 bg-white px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-600 shadow-xs">
-              <span
-                className={`h-1.5 w-1.5 rounded-full ${
-                  !shouldAutoAdvance
-                    ? 'bg-neutral-400'
-                    : 'bg-[#3B5BFF] animate-pulse'
-                }`}
-              />
-              {isAutoPaused ? 'Paused' : 'Auto · 6.5s'}
-            </span>
-          )}
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-neutral-500">
-            {isDesktop ? 'Click or use arrows' : 'Swipe or tap'} ·{' '}
-            {String(safeIndex + 1).padStart(2, '0')} /{' '}
-            {String(projects.length).padStart(2, '0')}
-          </p>
-        </div>
+        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-neutral-500">
+          {isDesktop ? 'Click or use arrows' : 'Swipe or tap'} ·{' '}
+          {String(safeIndex + 1).padStart(2, '0')} /{' '}
+          {String(projects.length).padStart(2, '0')}
+        </p>
       </div>
 
       {isDesktop ? (
