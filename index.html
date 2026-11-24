@@ -5,16 +5,48 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Chintan Nakum — Full-Stack Developer crafting scalable, intuitive web experiences. React, Node.js, and modern web technologies." />
   <title>Chintan Nakum — Full-Stack Developer</title>
-  <!-- Cabinet Grotesk, Space Grotesk, Clash Grotesk, Sora & JetBrains Mono & Instrument Serif Fonts -->
+
+  <!-- DNS-prefetch & preconnect for all font origins -->
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-  <link rel="stylesheet"
-    href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,600,700,800,900&f[]=space-grotesk@400,500,600,700&f[]=sora@400,500,600,700&f[]=panchang@200,300,400,500,600,700,800&f[]=clash-grotesk@200,300,400,500,600,700&display=swap" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;600;700&family=Roboto+Condensed:ital,wght@0,400;0,700;1,400;1,700&family=Sora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Syncopate:wght@400;700&display=swap"
-    rel="stylesheet" />
+
+  <!-- Primary font: Cabinet Grotesk — loaded with display=swap for fast paint -->
+  <link rel="preload" as="style"
+    href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&display=swap"
+    onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript>
+    <link rel="stylesheet"
+      href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&display=swap" />
+  </noscript>
+
+  <!-- Secondary / accent fonts — non-render-blocking, deferred -->
+  <link rel="preload" as="style"
+    href="https://api.fontshare.com/v2/css?f[]=sora@400,500,700&f[]=clash-grotesk@400,500,600,700&f[]=space-grotesk@400,500,700&f[]=panchang@400,700&display=swap"
+    onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript>
+    <link rel="stylesheet"
+      href="https://api.fontshare.com/v2/css?f[]=sora@400,500,700&f[]=clash-grotesk@400,500,600,700&f[]=space-grotesk@400,500,700&f[]=panchang@400,700&display=swap" />
+  </noscript>
+
+  <!-- Google Fonts: JetBrains Mono, Instrument Serif, Syncopate, Roboto Condensed -->
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;700&family=Syncopate:wght@400;700&family=Roboto+Condensed:wght@400;700&display=swap"
+    onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;700&family=Syncopate:wght@400;700&family=Roboto+Condensed:wght@400;700&display=swap" />
+  </noscript>
+
+  <!-- Force font-display:swap for all loaded fonts to prevent invisible text -->
+  <style>
+    @font-face { font-family: 'Cabinet Grotesk'; font-display: swap; }
+    @font-face { font-family: 'JetBrains Mono';  font-display: swap; }
+    @font-face { font-family: 'Sora';             font-display: swap; }
+    @font-face { font-family: 'Instrument Serif'; font-display: swap; }
+  </style>
 </head>
 
 <body class="bg-[#FAFAFA] text-neutral-900 antialiased selection:bg-[#3B5BFF]/15 selection:text-[#3B5BFF]">

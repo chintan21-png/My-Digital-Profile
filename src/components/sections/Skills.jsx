@@ -1,6 +1,13 @@
+import { useMemo } from 'react';
 import { PORTFOLIO_DATA } from '../../data/portfolioData';
 import { ScrollReveal } from '../common/ScrollReveal';
 import Iridescence from '../ui/Iridescence';
+
+// Detect touch/mobile to skip heavy WebGL per-card effect
+const isMobileDevice =
+  typeof window !== 'undefined' &&
+  (window.matchMedia('(max-width: 767px)').matches ||
+    window.matchMedia('(pointer: coarse)').matches);
 
 export const Skills = () => {
   const { skills } = PORTFOLIO_DATA;
@@ -29,7 +36,8 @@ export const Skills = () => {
             className="h-full"
           >
             <div className="group relative h-full rounded-3xl border border-neutral-200/90 bg-white/80 backdrop-blur-md p-6 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#3B5BFF]/30">
-              {/* Iridescence Interactive Background Effect */}
+              {/* Iridescence Interactive Background Effect — desktop only */}
+              {!isMobileDevice && (
               <div className="absolute inset-0 pointer-events-none opacity-40 transition-opacity duration-500 group-hover:opacity-65">
                 <Iridescence
                   color="#3b82f6"
@@ -51,6 +59,7 @@ export const Skills = () => {
                   fade={0}
                 />
               </div>
+              )}
 
               <div className="relative z-10 flex flex-col h-full">
                 <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-600 mb-4 pb-2 border-b border-neutral-200/60">

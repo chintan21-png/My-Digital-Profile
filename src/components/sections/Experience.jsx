@@ -52,6 +52,12 @@ export const Experience = () => {
 
   // Scroll tracking to dynamically animate the vertical timeline indicator
   useEffect(() => {
+    // Respect prefers-reduced-motion
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      setLineScale(1);
+      return;
+    }
+
     let ticking = false;
 
     const handleScroll = () => {
@@ -61,8 +67,9 @@ export const Experience = () => {
             const rect = timelineRef.current.getBoundingClientRect();
             const windowHeight = window.innerHeight;
 
-            // Start scaling as soon as the top of timeline enters the lower viewport
-            const startTrigger = windowHeight * 0.75;
+            // Mobile-safe: use 90 % of viewport height as start trigger
+            // so the line begins drawing as soon as the section is visible
+            const startTrigger = windowHeight * 0.9;
             const scrolledDistance = startTrigger - rect.top;
             const totalDistance = Math.max(rect.height, 1);
 
@@ -104,7 +111,7 @@ export const Experience = () => {
 
           <ScrollReveal direction="up" distance="20px" duration={700} delay={80}>
             <div>
-              <div className="mt-4 font-space-grotesk text-[clamp(2.6rem,5.5vw,5rem)] font-bold leading-[1.02] tracking-[-0.03em] text-[#111]">
+              <div className="mt-4 font-sora text-[clamp(2.6rem,5.5vw,5rem)] font-bold leading-[1.02] tracking-[-0.03em] text-[#111]">
                 <span className="block overflow-hidden">
                   <span className="block will-change-transform">
                     <span>
@@ -121,7 +128,7 @@ export const Experience = () => {
 
           <ScrollReveal direction="up" distance="20px" duration={700} delay={160}>
             <div className="mt-8 max-w-sm">
-              <p className="font-space-grotesk font-medium text-base leading-relaxed text-[#555]">
+              <p className="font-sora font-normal text-base leading-relaxed text-[#555]">
                 {summary.description}
               </p>
               <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.2em] text-[#888]">
@@ -153,15 +160,18 @@ export const Experience = () => {
           {experience.map((item, idx) => {
             const isEven = idx % 2 === 0;
             const tags = item.technologies || item.skills || item.tags || [];
+            // On mobile every card stacks vertically — cap stagger so last card
+            // isn't delayed by seconds on a short list
+            const mobileDelay = Math.min(idx * 80, 240);
 
             return (
               <div
                 key={idx}
-                className={`relative pb-16 pl-10 md:w-1/2 md:pl-0 last:pb-0 ${
+                className={`relative pb-14 pl-8 sm:pl-10 md:w-1/2 md:pl-0 last:pb-0 ${
                   isEven ? 'md:pr-14' : 'md:ml-auto md:pl-14'
                 }`}
               >
-                {/* Timeline Node Dot */}
+                {/* Timeline Node Dot — always left-aligned on mobile */}
                 <span
                   className={`absolute left-0 top-2 size-[11px] rounded-full border-2 border-[#3B5BFF] bg-white transition-all duration-300 ${
                     isEven ? 'md:left-auto md:-right-[5px]' : 'md:-left-[5px]'
@@ -174,14 +184,14 @@ export const Experience = () => {
                   direction="up"
                   distance="20px"
                   duration={650}
-                  delay={idx * 120}
+                  delay={mobileDelay}
                 >
                   <div data-testid={`experience-entry-${idx}`}>
                     <span className="inline-block rounded-full border border-black/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#555]">
                       {item.period}
                     </span>
 
-                    <h3 className="mt-4 font-space-grotesk text-xl sm:text-2xl font-bold tracking-tight text-[#111]">
+                    <h3 className="mt-4 font-sora text-xl sm:text-2xl font-bold tracking-tight text-[#111]">
                       {item.role}
                     </h3>
 
@@ -189,7 +199,7 @@ export const Experience = () => {
                       {item.company}
                     </p>
 
-                    <p className="mt-3 max-w-md font-space-grotesk text-sm sm:text-[14.5px] lg:text-[15px] font-medium leading-relaxed text-[#555]">
+                    <p className="mt-3 max-w-md font-sora text-sm sm:text-[14.5px] lg:text-[15px] font-normal leading-relaxed text-[#555]">
                       {renderHighlightedDescription(item.description, item.highlights)}
                     </p>
 

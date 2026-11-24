@@ -84,11 +84,11 @@ export const Work = () => {
                   </a>
                 </div>
 
-                {/* Title & Description with Space Grotesk */}
-                <h3 className="mt-4 font-space-grotesk text-xl sm:text-2xl lg:text-[23px] xl:text-[25px] font-bold leading-snug tracking-tight text-[#3B5BFF] md:text-neutral-950 md:group-hover:text-[#3B5BFF] transition-colors">
+                {/* Title & Description with Sora */}
+                <h3 className="mt-4 font-sora text-xl sm:text-2xl lg:text-[23px] xl:text-[25px] font-bold leading-snug tracking-tight text-[#3B5BFF] md:text-neutral-950 md:group-hover:text-[#3B5BFF] transition-colors">
                   {project.title}
                 </h3>
-                <p className="mt-2.5 sm:mt-3 font-space-grotesk text-sm sm:text-[14.5px] lg:text-[15px] font-medium leading-relaxed text-neutral-600">
+                <p className="mt-2.5 sm:mt-3 font-sora text-sm sm:text-[14.5px] lg:text-[15px] font-normal leading-relaxed text-neutral-600">
                   {renderHighlightedDescription(project.description, project.highlights)}
                 </p>
               </div>

@@ -26,6 +26,12 @@ export const About = () => {
 
   // Track viewport scroll progress to drive word-by-word reveal (down and up)
   useEffect(() => {
+    // Respect prefers-reduced-motion — show all words at full opacity
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      setScrollProgress(1);
+      return;
+    }
+
     let ticking = false;
 
     const handleScroll = () => {
@@ -34,14 +40,20 @@ export const About = () => {
           if (descriptionRef.current) {
             const rect = descriptionRef.current.getBoundingClientRect();
             const windowHeight = window.innerHeight;
+            const isMobile = windowHeight < 700;
 
-            // Start revealing when the top of the description is 82% down the viewport
-            const startY = windowHeight * 0.82;
-            // Finish revealing when the top reaches 20% down the viewport
-            const endY = windowHeight * 0.20;
-            const distance = (startY - endY) + rect.height * 0.4;
+            // On short viewports (mobile portrait/landscape) use more relaxed
+            // thresholds so words are not stuck invisible when the description
+            // fills most of the screen.
+            const startFraction = isMobile ? 0.95 : 0.82;
+            const endFraction   = isMobile ? 0.10 : 0.20;
 
-            const current = startY - rect.top;
+            const startY = windowHeight * startFraction;
+            const endY   = windowHeight * endFraction;
+            // Add a fraction of the element's own height for a gradual wave
+            const distance = (startY - endY) + rect.height * (isMobile ? 0.6 : 0.4);
+
+            const current  = startY - rect.top;
             const progress = Math.min(1, Math.max(0, current / distance));
             setScrollProgress(progress);
           }
@@ -111,7 +123,7 @@ export const About = () => {
       data-testid="about"
       className="w-full bg-[#F3F1EC] px-6 py-20 sm:py-24 md:px-12 md:py-32 lg:px-20 transition-colors"
     >
-      <div className="mx-auto max-w-7xl grid items-start gap-16 lg:grid-cols-[1.25fr_1fr] lg:gap-24">
+      <div className="mx-auto max-w-7xl grid items-start gap-12 sm:gap-16 lg:grid-cols-[1.25fr_1fr] lg:gap-24">
         {/* Left Column: About label, headline, scroll-scrubbed description, badges, and stats */}
         <div>
           <ScrollReveal direction="up" distance="24px" duration={700}>
@@ -135,7 +147,7 @@ export const About = () => {
           <div
             ref={descriptionRef}
             data-testid="about-description"
-            className="mt-8 space-y-6 max-w-2xl font-cabinet text-base sm:text-lg md:text-[1.22rem] leading-[1.65] text-[#111]"
+            className="mt-8 space-y-6 max-w-2xl font-sora text-base sm:text-lg md:text-[1.22rem] leading-[1.65] text-[#111]"
           >
             {paragraphWords.map((words, pIdx) => {
               // Calculate starting global index for words in this paragraph
@@ -207,13 +219,15 @@ export const About = () => {
 
         {/* Right Column: Arched portrait & metadata */}
         <ScrollReveal direction="up" distance="32px" duration={850} delay={180}>
-          <div className="relative mx-auto w-[min(420px,92%)] lg:w-full max-w-[420px] lg:sticky lg:top-28">
+          {/* On mobile the portrait renders below text — no sticky needed */}
+          <div className="relative mx-auto w-[min(380px,88%)] sm:w-[min(420px,92%)] lg:w-full max-w-[420px] lg:sticky lg:top-28">
             {/* Arched image container */}
             <div className="aspect-[3/4] overflow-hidden rounded-b-[36px] rounded-t-[999px] shadow-xl ring-1 ring-black/5 bg-[#EEF2FF] group">
               <div className="relative h-full w-full overflow-hidden bg-gradient-to-b from-[#EEF2FF] via-[#E4ECFF] to-[#DCE4FF]/60 flex items-center justify-center">
                 <img
                   alt={`Portrait of ${hero?.name || 'Chintan Nakum'}`}
-                  loading="lazy"
+                  loading="eager"
+                  fetchPriority="high"
                   decoding="async"
                   className="h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
                   src={profileImg}

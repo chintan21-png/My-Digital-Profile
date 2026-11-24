@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import emailjs from '@emailjs/browser';
 import {
@@ -16,6 +16,12 @@ import {
 import { PORTFOLIO_DATA } from '../../data/portfolioData';
 import { ScrollReveal } from '../common/ScrollReveal';
 import Lightfall from '../ui/Lightfall';
+
+// Skip heavy WebGL effect on touch/mobile devices
+const isMobileDevice =
+  typeof window !== 'undefined' &&
+  (window.matchMedia('(max-width: 767px)').matches ||
+    window.matchMedia('(pointer: coarse)').matches);
 
 export const Contact = () => {
   const { contact } = PORTFOLIO_DATA;
@@ -109,8 +115,9 @@ export const Contact = () => {
     <section id="contact" className="pt-14 pb-4 sm:pt-16 sm:pb-6 lg:pt-20 lg:pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <ScrollReveal direction="up" distance="32px" duration={800}>
         <div className="relative overflow-hidden rounded-3xl border border-neutral-800/80 bg-neutral-950 p-8 sm:p-14 lg:p-20 shadow-2xl flex flex-col items-center text-center">
-          {/* Lightfall WebGL background effect */}
+          {/* Lightfall WebGL background effect — desktop only */}
           <div className="absolute inset-0 z-0 pointer-events-auto">
+            {!isMobileDevice && (
             <Lightfall
               colors={['#ffffff']}
               backgroundColor="#3b82f6"
@@ -125,6 +132,10 @@ export const Contact = () => {
               holdToWarp
               intro
             />
+            )}
+            {isMobileDevice && (
+              <div className="absolute inset-0 bg-gradient-to-br from-[#1a2a6e] via-[#3B5BFF] to-[#2563eb]" />
+            )}
           </div>
 
           {/* Subtle radial overlay to enhance contrast and depth */}

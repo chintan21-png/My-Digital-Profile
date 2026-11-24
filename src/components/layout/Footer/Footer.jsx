@@ -41,11 +41,11 @@ export const Footer = () => {
       className="relative overflow-hidden border-t border-black/[0.08] bg-white px-6 pb-8 pt-4 sm:pt-6 md:pt-8 lg:px-20 font-cabinet"
     >
       {/* Interactive TechText Typography from React Bits */}
-      <div className="relative w-full h-[140px] sm:h-[180px] md:h-[220px] lg:h-[260px] select-none flex items-center justify-center">
+      <div className="relative w-full h-[160px] sm:h-[200px] md:h-[240px] lg:h-[280px] select-none flex items-center justify-center">
         <TechText
           text={NAV_BRAND.name.toUpperCase().replace(' ', '\u00A0\u00A0\u00A0')}
           fontFamily="'Panchang', -apple-system, BlinkMacSystemFont, sans-serif"
-          fontWeight={500}
+          fontWeight={800}
           fontSize={160}
           letterSpacing={0}
           color="#0B0C12"

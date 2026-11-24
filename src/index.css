@@ -31,6 +31,27 @@
 html,
 body {
   font-family: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Smooth native-momentum scroll as fallback if Lenis is not ready yet */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+}
+
+/* Ensure full-width sections never create horizontal overflow on mobile */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Prevent horizontal overflow blowout on small screens */
+body {
+  overflow-x: hidden;
+}
+
+/* Touch target: allow vertical scroll through scrollable areas */
+main,
+section {
+  touch-action: pan-y;
 }
 
 /* Custom Typography Helpers */
@@ -233,4 +254,47 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #a1a1aa;
+}
+
+/* ============================================================
+   MOBILE PERFORMANCE & SCROLL REVEAL OPTIMISATIONS
+   ============================================================ */
+
+/* Use content-visibility to skip rendering of off-screen sections
+   on the first paint — big LCP and TBT win on mobile */
+#work,
+#about,
+#experience,
+#skills,
+#contact {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 600px;
+}
+
+/* On reduced-motion devices, skip all transitions entirely */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mobile: shorter, snappier transitions to feel native */
+@media (max-width: 767px) {
+  /* Tighten all scroll-reveal transitions on small screens */
+  [style*="transition-duration"] {
+    transition-duration: 450ms !important;
+  }
+
+  /* Hide scrollbar on mobile – cleaner look */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  * {
+    scrollbar-width: none;
+  }
 }
