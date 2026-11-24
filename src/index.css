@@ -278,6 +278,37 @@ section {
   will-change: transform;
 }
 
+/* GPU-composited LightLines background streaks (zero main-thread JS RAF) */
+@keyframes light-streak-down {
+  0% {
+    transform: translate3d(0, -100%, 0);
+  }
+  100% {
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+@keyframes light-streak-up {
+  0% {
+    transform: translate3d(0, 100%, 0);
+  }
+  100% {
+    transform: translate3d(0, -100%, 0);
+  }
+}
+
+.animate-light-streak-down {
+  animation-name: light-streak-down;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.animate-light-streak-up {
+  animation-name: light-streak-up;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
 /* On reduced-motion devices, skip all transitions entirely */
 @media (prefers-reduced-motion: reduce) {
   *,
