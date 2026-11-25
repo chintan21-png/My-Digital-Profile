@@ -108,35 +108,40 @@ export const Contact = () => {
   };
 
   return (
-    <section id="contact" className="pt-14 pb-4 sm:pt-16 sm:pb-6 lg:pt-20 lg:pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <ScrollReveal direction="up" distance="32px" duration={800}>
-        <div className="relative overflow-hidden rounded-3xl border border-neutral-800/80 bg-neutral-950 p-8 sm:p-14 lg:p-20 shadow-2xl flex flex-col items-center text-center">
+    <section id="contact" className="pt-14 pb-4 sm:pt-16 sm:pb-6 lg:pt-20 lg:pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto [contain:layout_style]">
+      <ScrollReveal
+        direction="up"
+        distance={isMobile ? '18px' : '32px'}
+        duration={isMobile ? 500 : 800}
+      >
+        <div className="relative overflow-hidden rounded-3xl border border-neutral-800/80 bg-neutral-950 p-8 sm:p-14 lg:p-20 shadow-xl md:shadow-2xl flex flex-col items-center text-center [contain:layout_paint]">
           {/* Lightfall WebGL background effect — active on both mobile & desktop */}
           <div className="absolute inset-0 z-0 pointer-events-none">
             <Lightfall
               colors={['#ffffff']}
               backgroundColor="#3b82f6"
-              speed={isMobile ? 0.25 : 0.3}
+              speed={isMobile ? 0.28 : 0.3}
               streakCount={2}
-              streakWidth={isMobile ? 0.7 : 0.8}
+              streakWidth={0.8}
               streakLength={1}
-              twinkle={isMobile ? 0.25 : 0.3}
-              backgroundGlow={0.1}
+              twinkle={0.3}
+              backgroundGlow={isMobile ? 0.14 : 0.1}
               headGlow={0.6}
-              bloom={isMobile ? 0 : 0.35}
+              bloom={isMobile ? 0.28 : 0.35}
               dpr={isMobile ? 1 : undefined}
-              mouseInteraction={!isMobile}
-              holdToWarp={!isMobile}
-              intro={!isMobile}
+              mouseInteraction
+              holdToWarp
+              intro
+              paused={isModalOpen}
             />
           </div>
 
           {/* Subtle radial overlay to enhance contrast and depth */}
-          <div className="pointer-events-none absolute inset-0 z-[1] bg-radial from-transparent via-neutral-950/20 to-neutral-950/70" />
+          <div className="pointer-events-none absolute inset-0 z-[1] bg-radial from-transparent via-neutral-950/10 to-neutral-950/55 md:via-neutral-950/20 md:to-neutral-950/70" />
 
           {/* Foreground content - Minimalist Landing UI */}
           <div className="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-blue-500/30 bg-blue-500/10 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-blue-400 backdrop-blur-md">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-blue-500/30 bg-blue-950/80 md:bg-blue-500/10 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-blue-400 md:backdrop-blur-md">
               Initiate Conversation
             </span>
             <h2 className="mt-4 font-cabinet text-3xl sm:text-5xl font-extrabold tracking-tight text-white max-w-xl">
@@ -151,7 +156,7 @@ export const Contact = () => {
               <button
                 type="button"
                 onClick={handleOpenModal}
-                className="group inline-flex items-center gap-2 rounded-full bg-[#3B5BFF] px-8 py-4 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-white hover:text-neutral-950 hover:shadow-xl cursor-pointer"
+                className="group inline-flex items-center gap-2 rounded-full bg-[#3B5BFF] px-8 py-4 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-white shadow-lg shadow-blue-500/25 transition-colors duration-200 md:transition-all hover:bg-white hover:text-neutral-950 hover:shadow-xl active:scale-95 cursor-pointer"
               >
                 <FiMail className="h-4 w-4" />
                 <span>Send an Email</span>
@@ -162,7 +167,7 @@ export const Contact = () => {
                 href="https://github.com/chintan21-png"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-neutral-700 bg-neutral-900/70 backdrop-blur-md px-6 py-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-neutral-200 transition-all hover:border-neutral-400 hover:bg-neutral-800 hover:text-white"
+                className="inline-flex items-center gap-2 rounded-full border border-neutral-700 bg-neutral-900/90 md:bg-neutral-900/70 md:backdrop-blur-md px-6 py-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-neutral-200 transition-colors duration-200 md:transition-all hover:border-neutral-400 hover:bg-neutral-800 hover:text-white active:scale-95"
               >
                 <span>GitHub Profile</span>
                 <FiArrowUpRight className="h-4 w-4" />

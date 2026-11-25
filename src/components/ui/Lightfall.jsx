@@ -13,7 +13,10 @@ void main() {
 
 const STREAKS = `#version 300 es
 precision highp float;
+precision highp int;
 uniform vec2 uView;
+uniform float uBasis;
+uniform float uSpacing;
 uniform float uZoom;
 uniform float uPhase;
 uniform float uTwinkleClock;
@@ -36,7 +39,6 @@ out vec4 outColor;
 
 const vec3 CAMERA = vec3(0.0, -0.8888889, -0.2222222);
 const float TAU = 6.28318530718;
-const float SPACING = 0.005;
 
 uint scramble(uint x) {
   x ^= x >> 16;
@@ -64,7 +66,7 @@ float orb(float d, float r) {
 
 void main() {
   vec2 frag = gl_FragCoord.xy;
-  vec2 screen = (2.0 * frag - uView) / uView.x;
+  vec2 screen = (2.0 * frag - uView) / uBasis;
   vec2 p = screen;
   mat2 warp = mat2(1.0);
   float reach = uReach > 0.0 ? uReach : 0.32;
@@ -95,7 +97,7 @@ void main() {
     (hit.y * stepX.z - hit.z * stepX.y) / ring,
     stepY.x,
     (hit.y * stepY.z - hit.z * stepY.y) / ring
-  ) * warp * (2.0 / uView.x);
+  ) * warp * (2.0 / uBasis);
 
   vec2 gradX = vec2(jacobian[0][0], jacobian[1][0]);
   vec2 gradTheta = vec2(jacobian[0][1], jacobian[1][1]);
@@ -103,7 +105,7 @@ void main() {
   float det = max(abs(gradX.x * gradTheta.y - gradX.y * gradTheta.x), 1e-12);
   float along = scale / det;
   float skew = dot(gradX, gradTheta) / det;
-  float spacing = SPACING / scale;
+  float spacing = uSpacing / scale;
   float detail = smoothstep(1.6, 3.2, spacing);
   if (detail <= 0.0) {
     outColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -126,13 +128,13 @@ void main() {
   vec3 total = vec3(0.0);
   for (int layer = 0; layer < 16; layer++) {
     if (layer >= uStreakCount) break;
-    float x = hit.x + float(layer) * SPACING / 8.0;
-    float nearest = floor(x / SPACING + 0.5);
-    float side = x >= nearest * SPACING ? 1.0 : -1.0;
+    float x = hit.x + float(layer) * uSpacing / 8.0;
+    float nearest = floor(x / uSpacing + 0.5);
+    float side = x >= nearest * uSpacing ? 1.0 : -1.0;
     for (int k = 0; k < 2; k++) {
       if (k >= uColumns) break;
       float column = nearest + side * float(k);
-      float across = (x - column * SPACING) / scale;
+      float across = (x - column * uSpacing) / scale;
       uint seed = scramble(uint(int(column) + 65536) + uint(layer) * 0x9e3779b9u);
       uint next = scramble(seed);
       float hue = unit(seed >> 16);
@@ -159,6 +161,7 @@ void main() {
 
 const DOWNSAMPLE = `#version 300 es
 precision highp float;
+precision highp int;
 uniform sampler2D uSource;
 uniform vec2 uTarget;
 uniform vec2 uTexel;
@@ -176,6 +179,7 @@ void main() {
 
 const BLUR = `#version 300 es
 precision highp float;
+precision highp int;
 uniform sampler2D uSource;
 uniform vec2 uTarget;
 uniform vec2 uStep;
@@ -192,6 +196,7 @@ void main() {
 
 const COMPOSITE = `#version 300 es
 precision highp float;
+precision highp int;
 uniform sampler2D uScene;
 uniform sampler2D uBloom0;
 uniform sampler2D uBloom1;
@@ -201,6 +206,7 @@ uniform vec2 uView;
 uniform float uDecode;
 uniform float uGlow;
 uniform float uBloom;
+uniform int uBloomCount;
 uniform float uPresence;
 uniform float uOpacity;
 uniform float uFade;
@@ -217,11 +223,11 @@ float smootherstep01(float t) {
 void main() {
   vec2 uv = gl_FragCoord.xy / uView;
   vec3 light = texelFetch(uScene, ivec2(gl_FragCoord.xy), 0).rgb;
-  if (uBloom > 0.0) {
-    vec3 halo = texture(uBloom0, uv).rgb * 0.42;
-    halo += texture(uBloom1, uv).rgb * 0.3;
-    halo += texture(uBloom2, uv).rgb * 0.18;
-    halo += texture(uBloom3, uv).rgb * 0.1;
+  if (uBloom > 0.0 && uBloomCount > 0) {
+    vec3 halo = texture(uBloom0, uv).rgb * (uBloomCount <= 2 ? 0.58 : 0.42);
+    if (uBloomCount >= 2) halo += texture(uBloom1, uv).rgb * (uBloomCount <= 2 ? 0.42 : 0.3);
+    if (uBloomCount >= 3) halo += texture(uBloom2, uv).rgb * 0.18;
+    if (uBloomCount >= 4) halo += texture(uBloom3, uv).rgb * 0.1;
     light += halo * uBloom * (uLightMode > 0.5 ? 0.2 : 1.0);
   }
   light *= uDecode * uGlow * uPresence;
@@ -369,6 +375,12 @@ const Lightfall = ({
   useEffect(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
+    const applyFallbackBackground = () => {
+      if (container) {
+        container.style.background =
+          'radial-gradient(ellipse at 50% 0%, rgba(59, 130, 246, 0.38) 0%, rgba(59, 91, 255, 0.14) 45%, transparent 75%)';
+      }
+    };
     const gl = canvas?.getContext('webgl2', {
       alpha: true,
       premultipliedAlpha: true,
@@ -377,14 +389,24 @@ const Lightfall = ({
       stencil: false,
       powerPreference: 'high-performance'
     });
-    if (!container || !canvas || !gl) return undefined;
+    if (!container || !canvas || !gl) {
+      applyFallbackBackground();
+      return undefined;
+    }
 
-    const floatTargets = !!gl.getExtension('EXT_color_buffer_float');
+    const floatTargets = !!(
+      gl.getExtension('EXT_color_buffer_float') ||
+      gl.getExtension('EXT_color_buffer_half_float')
+    );
     const streakProgram = link(gl, STREAKS);
     const downProgram = link(gl, DOWNSAMPLE);
     const blurProgram = link(gl, BLUR);
     const compositeProgram = link(gl, COMPOSITE);
-    if (!streakProgram || !downProgram || !blurProgram || !compositeProgram) return undefined;
+    if (!streakProgram || !downProgram || !blurProgram || !compositeProgram) {
+      applyFallbackBackground();
+      return undefined;
+    }
+    container.style.background = '';
 
     const onContextLost = event => {
       event.preventDefault();
@@ -401,8 +423,9 @@ const Lightfall = ({
     gl.enableVertexAttribArray(0);
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 
-    const format = floatTargets ? gl.RGBA16F : gl.RGBA8;
-    const encode = floatTargets ? 1 : 0.25;
+    let format = floatTargets ? gl.RGBA16F : gl.RGBA8;
+    let encode = floatTargets ? 1 : 0.25;
+    let formatVerified = !floatTargets;
     const createTarget = () => ({ texture: null, framebuffer: gl.createFramebuffer(), width: 0, height: 0 });
     const scene = createTarget();
     const levels = Array.from({ length: BLOOM_LEVELS }, () => [createTarget(), createTarget()]);
@@ -421,6 +444,18 @@ const Lightfall = ({
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.bindFramebuffer(gl.FRAMEBUFFER, target.framebuffer);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, target.texture, 0);
+      if (!formatVerified) {
+        formatVerified = true;
+        if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+          format = gl.RGBA8;
+          encode = 0.25;
+          gl.deleteTexture(target.texture);
+          target.texture = null;
+          target.width = 0;
+          target.height = 0;
+          allocate(target, width, height);
+        }
+      }
     };
 
     const pass = (target, program) => {
@@ -456,9 +491,10 @@ const Lightfall = ({
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     const palette = new Float32Array(MAX_COLORS * 3);
     const pointer = { x: 0, y: 0, inside: false, held: false };
+    const touchOrigin = { x: 0, y: 0, active: false };
     const state = {
       travel: 0,
-      intro: settingsRef.current.intro && !reduce ? 0 : 1,
+      intro: settingsRef.current.intro && !reduce ? 0.15 : 1,
       mouseX: 0,
       mouseY: 0,
       lensX: 0,
@@ -469,22 +505,45 @@ const Lightfall = ({
     };
     let raf = 0;
     let last = 0;
-    let visible = true;
+    let visible = false;
+    let cssWidth = Math.max(1, container.clientWidth);
+    let cssHeight = Math.max(1, container.clientHeight);
+    let cachedColorKey = '';
+    let cachedColorCount = 1;
+    let cachedBgKey = '';
+    let cachedBgLinear = [0, 0, 0];
+    let touchTimer = 0;
+
+    const syncPalette = s => {
+      const key = s.colors.join('|');
+      if (key !== cachedColorKey) {
+        cachedColorKey = key;
+        const list = s.colors.map(toLinear);
+        cachedColorCount = list.length;
+        palette.fill(0);
+        for (let i = 0; i < MAX_COLORS; i++) palette.set(list[Math.min(i, list.length - 1)], i * 3);
+      }
+      if (s.backgroundColor !== cachedBgKey) {
+        cachedBgKey = s.backgroundColor;
+        cachedBgLinear = toLinear(s.backgroundColor);
+      }
+    };
 
     const render = (mobile = false) => {
       const s = settingsRef.current;
       const width = canvas.width;
       const height = canvas.height;
-      const cssWidth = Math.max(1, container.clientWidth);
-      const cssHeight = Math.max(1, container.clientHeight);
+      const bloomCount = s.bloom > 0 ? (mobile ? 2 : BLOOM_LEVELS) : 0;
+
       gl.bindVertexArray(vao);
       allocate(scene, width, height);
-      levels.forEach((pair, index) => {
+      for (let index = 0; index < bloomCount; index++) {
+        const pair = levels[index];
         const levelWidth = Math.max(1, Math.round(cssWidth / 2 ** (index + 1)));
         const levelHeight = Math.max(1, Math.round(cssHeight / 2 ** (index + 1)));
         allocate(pair[0], levelWidth, levelHeight);
         allocate(pair[1], levelWidth, levelHeight);
-      });
+      }
 
       const intro = state.intro;
       const presence = Math.min(1, intro * 2.2);
@@ -493,31 +552,34 @@ const Lightfall = ({
       const period = TAU / rings;
       const clock = 9 + state.travel;
 
-      const list = s.colors.map(toLinear);
-      palette.fill(0);
-      for (let i = 0; i < MAX_COLORS; i++) palette.set(list[Math.min(i, list.length - 1)], i * 3);
+      syncPalette(s);
 
-      const toScreenX = value => (2 * value - width) / width;
-      const toScreenY = value => (2 * value - height) / width;
+      // Desktop uses width & 0.005 spacing (100% original).
+      // Mobile uses max(width, height) & 0.009 spacing so portrait cards don't drop below
+      // the shader's 1.6px Moire cutoff across the top half of the card.
+      const basis = mobile ? Math.max(width, height) : width;
+      const effectiveSpacing = mobile ? 0.009 : 0.005;
+      const effectiveZoom = mobile ? Math.max(2.35, s.zoom * 0.82) : s.zoom;
+      const effectiveReach = mobile ? 0.55 : 0.32;
+      const effectiveWidth = 5e-4 * s.streakWidth * (effectiveSpacing / 0.005);
 
-      // On desktop: EXACT original values (zoom = s.zoom, reach = 0.32, streakCount = s.streakCount)
-      // On mobile: tuned zoom and reach so the 3D curves show instead of a flat vertical slice
-      const effectiveZoom = mobile ? Math.max(1.85, s.zoom * 0.65) : s.zoom;
-      const effectiveReach = mobile ? 0.60 : 0.32;
-      const effectiveStreakCount = s.streakCount;
+      const toScreenX = value => (2 * value - width) / basis;
+      const toScreenY = value => (2 * value - height) / basis;
 
       const r = pass(scene, streakProgram);
       gl.uniform2f(r.uView, width, height);
+      gl.uniform1f(r.uBasis, basis);
+      gl.uniform1f(r.uSpacing, effectiveSpacing);
       gl.uniform1f(r.uZoom, effectiveZoom);
       gl.uniform1f(r.uReach, effectiveReach);
       gl.uniform1f(r.uPhase, clock % (16 * period));
       gl.uniform1f(r.uTwinkleClock, clock % TAU);
       gl.uniform1f(r.uRings, rings);
       gl.uniform3fv(r.uColors, palette);
-      gl.uniform1i(r.uColorCount, list.length);
-      gl.uniform1i(r.uStreakCount, effectiveStreakCount);
+      gl.uniform1i(r.uColorCount, cachedColorCount);
+      gl.uniform1i(r.uStreakCount, s.streakCount);
       gl.uniform1i(r.uColumns, s.streakWidth > 1 ? 2 : 1);
-      gl.uniform1f(r.uWidth, 5e-4 * s.streakWidth);
+      gl.uniform1f(r.uWidth, effectiveWidth);
       gl.uniform1f(r.uTail, 19 / (s.streakLength * stretch));
       gl.uniform1f(r.uTwinkle, s.twinkle);
       gl.uniform1f(r.uHead, s.headGlow);
@@ -539,9 +601,10 @@ const Lightfall = ({
       gl.uniform1f(r.uEncode, encode);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-      if (s.bloom > 0) {
+      if (bloomCount > 0) {
         let source = scene;
-        levels.forEach(([front, back]) => {
+        for (let index = 0; index < bloomCount; index++) {
+          const [front, back] = levels[index];
           const d = pass(front, downProgram);
           bind(0, source.texture);
           gl.uniform1i(d.uSource, 0);
@@ -564,44 +627,54 @@ const Lightfall = ({
           gl.uniform2f(b.uStep, 0, 1 / back.height);
           gl.drawArrays(gl.TRIANGLES, 0, 3);
           source = front;
-        });
+        }
       }
 
       const c = pass(null, compositeProgram);
       bind(0, scene.texture);
       gl.uniform1i(c.uScene, 0);
-      levels.forEach(([front], index) => {
-        bind(index + 1, front.texture);
+      for (let index = 0; index < bloomCount; index++) {
+        bind(index + 1, levels[index][0].texture);
         gl.uniform1i(c[`uBloom${index}`], index + 1);
-      });
+      }
       gl.uniform2f(c.uView, width, height);
       gl.uniform1f(c.uDecode, 1 / encode);
       gl.uniform1f(c.uGlow, s.glow);
       gl.uniform1f(c.uBloom, s.bloom);
+      gl.uniform1i(c.uBloomCount, bloomCount);
       gl.uniform1f(c.uPresence, presence);
       gl.uniform1f(c.uOpacity, s.opacity);
       gl.uniform1f(c.uFade, s.fade);
       gl.uniform1f(c.uLightMode, s.lightMode ? 1 : 0);
-      gl.uniform3fv(c.uTopColor, toLinear(s.backgroundColor));
+      gl.uniform3fv(c.uTopColor, cachedBgLinear);
       gl.uniform1f(c.uTopGlow, s.backgroundGlow);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-      for (let unit = BLOOM_LEVELS; unit >= 0; unit--) bind(unit, null);
+      for (let unit = bloomCount; unit >= 0; unit--) bind(unit, null);
     };
+
+    const isMobileViewport = () =>
+      cssWidth < 768 || (typeof window !== 'undefined' && window.innerWidth < 768);
 
     const frame = now => {
       raf = 0;
       if (!visible || document.hidden) return;
+
+      const mobile = isMobileViewport();
+      // Cap mobile WebGL loop to ~60fps (skips redundant 8.3ms frames on 120Hz phones like Oppo F27)
+      if (mobile && last && now - last < 13.5) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
+
       const s = settingsRef.current;
       const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
       last = now;
       if (!s.intro || reduce) state.intro = 1;
       else if (state.intro < 1) state.intro = Math.min(1, state.intro + dt / INTRO_SECONDS);
 
-      const cssWidth = Math.max(1, container.clientWidth);
-      const isMobile = cssWidth < 768 || (typeof window !== 'undefined' && window.innerWidth < 768);
       const ratio = canvas.width / cssWidth;
 
-      if (!isMobile) {
+      if (!mobile) {
         // ===============================================
         // DESKTOP: 100% UNCHANGED, EXACT ORIGINAL LOGIC
         // ===============================================
@@ -612,7 +685,7 @@ const Lightfall = ({
         if (running) state.travel += dt * 0.1 * s.speed * (1 + rush);
 
         const targetX = pointer.x * ratio;
-        const targetY = (container.clientHeight - pointer.y) * ratio;
+        const targetY = (cssHeight - pointer.y) * ratio;
         const engaged = s.mouseInteraction && pointer.inside && !reduce;
         if (engaged && state.touch < 0.01) {
           state.mouseX = targetX;
@@ -647,7 +720,7 @@ const Lightfall = ({
       if (userEngaged) {
         state.lastInteractionTime = nowSec;
         targetX = pointer.x * ratio;
-        targetY = (container.clientHeight - pointer.y) * ratio;
+        targetY = (cssHeight - pointer.y) * ratio;
         targetTouch = 1.0;
         targetHolding = s.holdToWarp && pointer.held && !reduce;
       } else {
@@ -664,8 +737,8 @@ const Lightfall = ({
         const normX = 0.5 + 0.35 * Math.sin(nowSec * 0.82) + 0.12 * Math.sin(nowSec * 1.75);
         const normY = 0.5 + 0.28 * Math.cos(nowSec * 0.64) + 0.1 * Math.cos(nowSec * 1.38);
 
-        targetX = normX * container.clientWidth * ratio;
-        targetY = normY * container.clientHeight * ratio;
+        targetX = normX * canvas.width;
+        targetY = normY * canvas.height;
         targetTouch = 0.9 * ambientFadeIn;
         targetHolding = ambientSurge > 0.08 && !reduce;
       }
@@ -699,18 +772,21 @@ const Lightfall = ({
     };
 
     const wake = () => {
-      if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame);
+      if (!raf && visible && !document.hidden) {
+        last = 0;
+        raf = requestAnimationFrame(frame);
+      }
     };
 
     const resize = () => {
       const s = settingsRef.current;
-      const width = Math.max(1, container.clientWidth);
-      const height = Math.max(1, container.clientHeight);
-      const isMobile = width < 768;
-      const ratio = Math.min(s.dpr || (isMobile ? 1 : window.devicePixelRatio) || 1, 2);
-      canvas.width = Math.max(1, Math.round(width * ratio));
-      canvas.height = Math.max(1, Math.round(height * ratio));
-      if (!raf) render(isMobile);
+      cssWidth = Math.max(1, container.clientWidth);
+      cssHeight = Math.max(1, container.clientHeight);
+      const mobile = isMobileViewport();
+      const ratio = Math.min(s.dpr || (mobile ? 1 : window.devicePixelRatio) || 1, 2);
+      canvas.width = Math.max(1, Math.round(cssWidth * ratio));
+      canvas.height = Math.max(1, Math.round(cssHeight * ratio));
+      if (!raf) render(mobile);
       wake();
     };
 
@@ -722,6 +798,7 @@ const Lightfall = ({
     };
 
     const onPointerMove = event => {
+      if (!visible || !settingsRef.current.mouseInteraction || event.pointerType === 'touch') return;
       const point = locate(event);
       pointer.x = point.x;
       pointer.y = point.y;
@@ -730,6 +807,7 @@ const Lightfall = ({
     };
 
     const onPointerDown = event => {
+      if (!visible || !settingsRef.current.mouseInteraction || event.pointerType === 'touch') return;
       const point = locate(event);
       if (!point.inside) return;
       pointer.x = point.x;
@@ -751,10 +829,15 @@ const Lightfall = ({
     };
 
     const onTouchStart = event => {
+      if (!visible || !settingsRef.current.mouseInteraction) return;
       if (event.touches && event.touches.length > 0) {
         const touch = event.touches[0];
         const point = locate(touch);
         if (!point.inside) return;
+        touchOrigin.x = touch.clientX;
+        touchOrigin.y = touch.clientY;
+        touchOrigin.active = true;
+        clearTimeout(touchTimer);
         pointer.x = point.x;
         pointer.y = point.y;
         pointer.inside = true;
@@ -764,22 +847,24 @@ const Lightfall = ({
     };
 
     const onTouchMove = event => {
-      if (event.touches && event.touches.length > 0) {
-        const touch = event.touches[0];
-        const point = locate(touch);
-        pointer.x = point.x;
-        pointer.y = point.y;
-        pointer.inside = point.inside;
-        wake();
+      if (!touchOrigin.active || !event.touches || event.touches.length === 0) return;
+      const touch = event.touches[0];
+      // Cancel touch engagement immediately on scroll gestures (zero getBoundingClientRect calls)
+      if (Math.hypot(touch.clientX - touchOrigin.x, touch.clientY - touchOrigin.y) > 12) {
+        touchOrigin.active = false;
+        pointer.held = false;
+        pointer.inside = false;
       }
     };
 
     const onTouchEnd = () => {
+      touchOrigin.active = false;
       pointer.held = false;
-      setTimeout(() => {
+      clearTimeout(touchTimer);
+      touchTimer = setTimeout(() => {
         pointer.inside = false;
         wake();
-      }, 800);
+      }, 600);
       wake();
     };
 
@@ -790,13 +875,16 @@ const Lightfall = ({
 
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
-    const intersection = new IntersectionObserver(entries => {
-      visible = entries.some(entry => entry.isIntersecting);
-      if (visible) {
-        last = 0;
-        wake();
-      }
-    });
+    const intersection = new IntersectionObserver(
+      entries => {
+        visible = entries.some(entry => entry.isIntersecting);
+        if (visible) {
+          last = 0;
+          wake();
+        }
+      },
+      { threshold: 0, rootMargin: '80px 0px' }
+    );
     intersection.observe(container);
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointerdown', onPointerDown, { passive: true });
@@ -818,12 +906,13 @@ const Lightfall = ({
         resize();
         return;
       }
-      if (!raf) render(container.clientWidth < 768);
+      if (!raf) render(isMobileViewport());
       wake();
     };
 
     return () => {
       cancelAnimationFrame(raf);
+      clearTimeout(touchTimer);
       wakeRef.current = null;
       canvas.removeEventListener('webglcontextlost', onContextLost);
       canvas.removeEventListener('webglcontextrestored', onContextRestored);

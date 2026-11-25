@@ -259,19 +259,18 @@ section {
 /* Iridescent fluid shimmer animation for mobile skills cards */
 @keyframes iridescent-drift {
   0% {
-    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    transform: translate3d(-4%, -3%, 0) rotate(-8deg) scale(1);
   }
   50% {
-    transform: translate3d(-6%, 6%, 0) rotate(180deg) scale(1.15);
+    transform: translate3d(4%, 4%, 0) rotate(12deg) scale(1.06);
   }
   100% {
-    transform: translate3d(0, 0, 0) rotate(360deg) scale(1);
+    transform: translate3d(-2%, 3%, 0) rotate(-4deg) scale(1.02);
   }
 }
 
 .animate-iridescent-drift {
-  animation: iridescent-drift 14s ease-in-out infinite alternate;
-  will-change: transform;
+  animation: iridescent-drift 12s ease-in-out infinite alternate;
 }
 
 /* GPU-composited LightLines background streaks (zero main-thread JS RAF) */

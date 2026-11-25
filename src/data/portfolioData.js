@@ -14,7 +14,7 @@ export const PORTFOLIO_DATA = {
     {
       id: "project-1",
       title: "Bizconnect E-Commerce Platform",
-      category: "Full Stack / E-Commerce",
+      category: "Front-end / E-Commerce",
       description: "Developed a dynamic e-commerce storefront template with reusable UI components, API-driven product management, and seamless shopping experiences. Integrated TanStack Query for efficient server-state management, caching, and optimized API interactions.",
       highlights: [
         "dynamic e-commerce storefront template",

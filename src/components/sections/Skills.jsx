@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { PORTFOLIO_DATA } from '../../data/portfolioData';
 import { ScrollReveal } from '../common/ScrollReveal';
 import Iridescence from '../ui/Iridescence';
@@ -6,10 +7,51 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 export const Skills = () => {
   const { skills } = PORTFOLIO_DATA;
   const isMobile = useIsMobile();
+  const sectionRef = useRef(null);
+  const [isInView, setIsInView] = useState(false);
+  const [isTabVisible, setIsTabVisible] = useState(() =>
+    typeof document === 'undefined' ? true : !document.hidden
+  );
+
+  // Only run mobile CSS shimmer animation when #skills is near/in viewport and tab is visible
+  useEffect(() => {
+    if (!isMobile) return undefined;
+
+    const node = sectionRef.current;
+    if (!node) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: '80px 0px' }
+    );
+    observer.observe(node);
+
+    const handleVisibility = () => {
+      setIsTabVisible(!document.hidden);
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [isMobile]);
+
+  const isShimmerActive = isMobile && isInView && isTabVisible;
 
   return (
-    <section id="skills" className="py-14 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <ScrollReveal direction="up" distance="24px" duration={650}>
+    <section
+      ref={sectionRef}
+      id="skills"
+      className="py-14 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto [contain:layout_paint]"
+    >
+      <ScrollReveal
+        direction="up"
+        distance={isMobile ? '16px' : '24px'}
+        duration={isMobile ? 450 : 650}
+      >
         <div className="flex flex-col items-start gap-2 mb-10 sm:mb-12">
           <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[#3B5BFF]">
             Tooling & Stack
@@ -25,16 +67,28 @@ export const Skills = () => {
           <ScrollReveal
             key={idx}
             direction="up"
-            distance="24px"
-            duration={650}
+            distance={isMobile ? '16px' : '24px'}
+            duration={isMobile ? 450 : 650}
             delay={isMobile ? 0 : idx * 120}
             className="h-full"
           >
-            <div className="group relative h-full rounded-3xl border border-neutral-200/90 bg-white/95 md:bg-white/80 md:backdrop-blur-md p-6 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:border-[#3B5BFF]/30">
-              {/* Fluid Iridescent Shimmer Animation for Mobile (100% GPU-accelerated, 0 WebGL overhead) */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-45 md:hidden">
-                <div className="absolute -inset-[50%] animate-iridescent-drift bg-[radial-gradient(circle_at_30%_30%,rgba(59,130,246,0.35),transparent_60%),radial-gradient(circle_at_70%_70%,rgba(99,102,241,0.3),transparent_60%),radial-gradient(circle_at_50%_50%,rgba(56,189,248,0.25),transparent_50%)] blur-xl" />
-              </div>
+            <div className="group relative h-full rounded-3xl border border-neutral-200/90 bg-white md:bg-white/80 md:backdrop-blur-md p-6 shadow-sm overflow-hidden md:transition-[border-color,box-shadow] md:duration-300 md:hover:shadow-md md:hover:border-[#3B5BFF]/30">
+              {/* Lightweight GPU-composited Shimmer for Mobile (zero blur filter, paused off-screen) */}
+              {isMobile && (
+                <div
+                  className="absolute inset-0 pointer-events-none overflow-hidden opacity-55"
+                  aria-hidden="true"
+                >
+                  <div
+                    className="absolute -inset-[20%] animate-iridescent-drift bg-[radial-gradient(circle_at_28%_28%,rgba(59,130,246,0.28),transparent_65%),radial-gradient(circle_at_72%_72%,rgba(99,102,241,0.24),transparent_65%),radial-gradient(circle_at_50%_50%,rgba(56,189,248,0.20),transparent_60%)]"
+                    style={{
+                      animationPlayState: isShimmerActive ? 'running' : 'paused',
+                      animationDelay: `${idx * -3.5}s`,
+                      willChange: isShimmerActive ? 'transform' : 'auto',
+                    }}
+                  />
+                </div>
+              )}
 
               {/* Iridescence Interactive Background Effect — desktop only */}
               {!isMobile && (
@@ -69,7 +123,7 @@ export const Skills = () => {
                   {group.items.map((skill) => (
                     <span
                       key={skill}
-                      className="rounded-xl border border-neutral-200/80 bg-white/90 md:bg-white/80 md:backdrop-blur-sm px-3 py-1.5 font-cabinet text-sm font-medium text-neutral-800 transition-all duration-200 hover:border-[#3B5BFF] hover:bg-white hover:text-[#3B5BFF] hover:shadow-xs active:scale-95 active:border-[#3B5BFF] active:text-[#3B5BFF]"
+                      className="rounded-xl border border-neutral-200/80 bg-neutral-50/90 md:bg-white/80 md:backdrop-blur-sm px-3 py-1.5 font-cabinet text-sm font-medium text-neutral-800 transition-transform duration-150 md:transition-[transform,color,background-color,border-color,box-shadow] md:duration-200 md:hover:border-[#3B5BFF] md:hover:bg-white md:hover:text-[#3B5BFF] md:hover:shadow-xs active:scale-95 active:border-[#3B5BFF] active:text-[#3B5BFF]"
                     >
                       {skill}
                     </span>
